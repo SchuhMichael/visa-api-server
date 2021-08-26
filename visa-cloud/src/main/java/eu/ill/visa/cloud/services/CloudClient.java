@@ -52,6 +52,9 @@ public class CloudClient {
     }
 
     public CloudInstance instance(final String id) throws CloudException {
+        if (id == null) {
+            return null;
+        }
         logger.debug("Fetching cloud instance with id: {}", id);
         return provider.instance(id);
     }

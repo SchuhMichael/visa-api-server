@@ -13,7 +13,7 @@ import javax.json.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static eu.ill.visa.cloud.helpers.JsonHelper.parse;
+import static eu.ill.visa.cloud.helpers.JsonHelper.parseObject;
 import static eu.ill.visa.cloud.http.HttpMethod.*;
 import static java.lang.String.format;
 import static javax.json.Json.createArrayBuilder;
@@ -44,7 +44,7 @@ public class OpenStackProvider implements CloudProvider {
     }
 
     private Map<String, String> buildDefaultHeaders(final String authToken) {
-        return new HashMap<String, String>() {{
+        return new HashMap<>() {{
             put(HEADER_X_AUTH_TOKEN, authToken);
         }};
     }
@@ -59,7 +59,7 @@ public class OpenStackProvider implements CloudProvider {
             return null;
         }
 
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         final List<CloudImage> images = new ArrayList<>();
         for (final JsonValue imageValue : results.getJsonArray("images")) {
             final JsonObject cloudImage = (JsonObject) imageValue;
@@ -78,7 +78,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             return null;
         }
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         return ImageConverter.fromJson(results);
     }
 
@@ -92,7 +92,7 @@ public class OpenStackProvider implements CloudProvider {
             return null;
         }
 
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         final List<CloudFlavour> flavors = new ArrayList<>();
         for (final JsonValue flavorValue : results.getJsonArray("flavors")) {
             final JsonObject cloudFlavor = (JsonObject) flavorValue;
@@ -111,7 +111,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             return null;
         }
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         return FlavorConverter.fromJson(results.getJsonObject("flavor"));
     }
 
@@ -119,7 +119,7 @@ public class OpenStackProvider implements CloudProvider {
         final List<CloudInstanceIdentifier> servers = new ArrayList<>();
         for (final JsonValue serverValue : response.getJsonArray("servers")) {
             final JsonObject cloudServerIdentifier = (JsonObject) serverValue;
-            final CloudInstanceIdentifier server = ServerIdentifierConverter.fromJson(cloudServerIdentifier);
+            final CloudInstanceIdentifier server = InstanceIdentifierConverter.fromJson(cloudServerIdentifier);
             servers.add(server);
         }
         return servers;
@@ -129,7 +129,7 @@ public class OpenStackProvider implements CloudProvider {
         final List<CloudInstance> servers = new ArrayList<>();
         for (final JsonValue serverValue : response.getJsonArray("servers")) {
             final JsonObject cloudServer = (JsonObject) serverValue;
-            final CloudInstance server = ServerConverter.fromJson(cloudServer, configuration.getAddressProvider());
+            final CloudInstance server = InstanceConverter.fromJson(cloudServer, configuration.getAddressProvider());
             servers.add(server);
         }
         return servers;
@@ -144,7 +144,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             return null;
         }
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         return buildServerIdentifiersResponse(results);
     }
 
@@ -157,7 +157,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             return null;
         }
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         return buildServersResponse(results);
     }
 
@@ -174,8 +174,8 @@ public class OpenStackProvider implements CloudProvider {
                 throw new CloudException("Error in response getting instance from OpenStack. Error code: " + response.getCode());
             }
         }
-        final JsonObject results = parse(response.getBody());
-        return ServerConverter.fromJson(results.getJsonObject("server"), configuration.getAddressProvider());
+        final JsonObject results = parseObject(response.getBody());
+        return InstanceConverter.fromJson(results.getJsonObject("server"), configuration.getAddressProvider());
     }
 
     @Override
@@ -210,6 +210,18 @@ public class OpenStackProvider implements CloudProvider {
     }
 
     @Override
+    public void shutdownInstance(String id) throws CloudException {
+        final String json = createObjectBuilder().addNull("os-stop").build().toString();
+        final String url = format("%s/v2/servers/%s/action", configuration.getComputeEndpoint(), id);
+        final String authToken = authenticate();
+        final Map<String, String> headers = buildDefaultHeaders(authToken);
+        final HttpResponse response = httpClient.sendRequest(url, POST, headers, json);
+        if (!response.isSuccessful()) {
+            throw new CloudException(format("Could not shutdown server with id %s and response %s: ", id, response.getBody()));
+        }
+    }
+
+    @Override
     public void updateSecurityGroups(String id, List<String> securityGroupNames) throws CloudException {
         final String url = format("%s/v2/servers/%s/os-security-groups", configuration.getComputeEndpoint(), id);
         final String authToken = authenticate();
@@ -218,7 +230,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             logger.warn("Could not get security groups from the server with id {} and response {}", id, response.getBody());
         }
-        final JsonArray currentSecurityGroups = parse(response.getBody()).getJsonArray("security_groups");
+        final JsonArray currentSecurityGroups = parseObject(response.getBody()).getJsonArray("security_groups");
         final List<String> currentSecurityGroupNames = currentSecurityGroups.stream().map(jsonValue -> jsonValue.asJsonObject().getString("name")).collect(Collectors.toUnmodifiableList());
         List<String> securityGroupNamesToRemove = currentSecurityGroupNames.stream().filter(name -> !securityGroupNames.contains(name)).collect(Collectors.toUnmodifiableList());
         List<String> securityGroupNamesToAdd = securityGroupNames.stream().filter(name -> !currentSecurityGroupNames.contains(name)).collect(Collectors.toUnmodifiableList());
@@ -249,18 +261,6 @@ public class OpenStackProvider implements CloudProvider {
     }
 
     @Override
-    public void shutdownInstance(String id) throws CloudException {
-        final String json = createObjectBuilder().addNull("os-stop").build().toString();
-        final String url = format("%s/v2/servers/%s/action", configuration.getComputeEndpoint(), id);
-        final String authToken = authenticate();
-        final Map<String, String> headers = buildDefaultHeaders(authToken);
-        final HttpResponse response = httpClient.sendRequest(url, POST, headers, json);
-        if (!response.isSuccessful()) {
-            throw new CloudException(format("Could not shutdown server with id %s and response %s: ", id, response.getBody()));
-        }
-    }
-
-    @Override
     public CloudInstance createInstance(final String name,
                                         final String imageId,
                                         final String flavorId,
@@ -271,7 +271,7 @@ public class OpenStackProvider implements CloudProvider {
         final List<JsonObject> securityGroupObjects = securityGroupNames.stream().map(securityGroupName ->
             createObjectBuilder().add("name", securityGroupName).build()).collect(Collectors.toUnmodifiableList());
 
-        JsonArrayBuilder securityGroupsBuilder = createArrayBuilder();
+        final JsonArrayBuilder securityGroupsBuilder = createArrayBuilder();
         securityGroupObjects.forEach(securityGroupsBuilder::add);
         final JsonArray securityGroups = securityGroupsBuilder.build();
 
@@ -303,7 +303,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             throw new CloudException(format("Could not create server with name %s and response %s ", name, response.getBody()));
         }
-        final JsonObject result = parse(response.getBody()).getJsonObject("server");
+        final JsonObject result = parseObject(response.getBody()).getJsonObject("server");
         final String id = result.getString("id");
         return this.instance(id);
     }
@@ -328,7 +328,7 @@ public class OpenStackProvider implements CloudProvider {
         if (!response.isSuccessful()) {
             return null;
         }
-        final JsonObject results = parse(response.getBody());
+        final JsonObject results = parseObject(response.getBody());
         return LimitConverter.fromJson(results);
     }
 
