@@ -105,4 +105,10 @@ public class CloudClient {
     public String ip(final String id) throws CloudException {
         return provider.ip(id);
     }
+
+    public List<String> securityGroups() throws CloudException {
+        logger.info("Fetching cloud security groups");
+        return provider.securityGroups();
+    }
+
 }

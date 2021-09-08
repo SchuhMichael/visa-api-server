@@ -57,6 +57,7 @@ public class CloudClientFactory {
         requireNonNull(parameters.get("identityEndpoint"), "identityEndpoint endpoint must be set");
         requireNonNull(parameters.get("computeEndpoint"), "computeEndpoint endpoint must be set");
         requireNonNull(parameters.get("imageEndpoint"), "imageEndpoint endpoint must be set");
+        requireNonNull(parameters.get("networkEndpoint"), "networkEndpoint must be set");
         requireNonNull(parameters.get("applicationId"), "applicationId must be set");
         requireNonNull(parameters.get("applicationSecret"), "applicationSecret must be set");
         requireNonNull(parameters.get("addressProvider"), "addressProvider must be set");
