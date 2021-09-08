@@ -17,7 +17,7 @@ public class InstanceConverter {
         final String name = json.getString("name");
         final DateTime createdAt = new DateTime(json.getString("createdAt"));
         final String imageId = json.getString("imageId");
-        final String flavorId = json.getString("flavorId");
+        final String flavorId = json.getString("flavourId");
         final String address = address(json);
         final CloudInstanceState state = convertStatus(json.getString("state"));
 
@@ -68,38 +68,8 @@ public class InstanceConverter {
             fault.getString("createdAt"));
     }
 
-
-    // TODO Create a more generic status mapping
     private static CloudInstanceState convertStatus(String openStackStatus) {
-        switch (openStackStatus) {
-            case "BUILD":
-            case "REBUILD":
-                return CloudInstanceState.BUILDING;
-            case "ACTIVE":
-                return CloudInstanceState.ACTIVE;
-            case "HARD_REBOOT":
-            case "REBOOT":
-                return CloudInstanceState.REBOOTING;
-            case "MIGRATING":
-            case "RESCUE":
-            case "RESIZE":
-            case "REVERT_RESIZE":
-            case "VERIFY_SIZE":
-                return CloudInstanceState.UNAVAILABLE;
-            case "DELETED":
-            case "SHELVED":
-            case "SHELVED_OFFLOADED":
-            case "SOFT_DELETED":
-                return CloudInstanceState.DELETED;
-            case "PAUSED":
-            case "SHUTOFF":
-            case "SUSPENDED":
-                return CloudInstanceState.STOPPED;
-            case "ERROR":
-                return CloudInstanceState.ERROR;
-            case "UNKNOWN":
-            default:
-                return CloudInstanceState.UNKNOWN;
-        }
+        return CloudInstanceState.valueOf(openStackStatus);
     }
+
 }

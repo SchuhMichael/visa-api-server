@@ -142,4 +142,6 @@ public interface CloudProvider {
      * @throws CloudException if there was an exception executing the request
      */
     CloudLimit limits() throws CloudException;
+
+    List<String> securityGroups() throws CloudException;
 }

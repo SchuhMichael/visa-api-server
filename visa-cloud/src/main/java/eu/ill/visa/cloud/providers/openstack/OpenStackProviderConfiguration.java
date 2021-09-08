@@ -10,6 +10,7 @@ public class OpenStackProviderConfiguration {
     private final String computeEndpoint;
     private final String imageEndpoint;
     private final String identityEndpoint;
+    private final String networkEndpoint;
 
     private final String addressProvider;
 
@@ -20,6 +21,7 @@ public class OpenStackProviderConfiguration {
         this.applicationSecret = values.get("applicationSecret");
         this.computeEndpoint = values.get("computeEndpoint");
         this.imageEndpoint = values.get("imageEndpoint");
+        this.networkEndpoint = values.get("networkEndpoint");
         this.identityEndpoint = values.get("identityEndpoint");
         this.addressProvider = values.get("addressProvider");
         this.addressProviderUUID = values.get("addressProviderUUID");
@@ -53,5 +55,8 @@ public class OpenStackProviderConfiguration {
         return addressProvider;
     }
 
+    public String getNetworkEndpoint() {
+        return networkEndpoint;
+    }
 
 }

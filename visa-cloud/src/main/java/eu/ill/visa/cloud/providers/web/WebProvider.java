@@ -5,11 +5,7 @@ import eu.ill.visa.cloud.exceptions.CloudException;
 import eu.ill.visa.cloud.http.HttpClient;
 import eu.ill.visa.cloud.http.HttpResponse;
 import eu.ill.visa.cloud.providers.CloudProvider;
-import eu.ill.visa.cloud.providers.web.converters.LimitConverter;
-import eu.ill.visa.cloud.providers.web.converters.FlavorConverter;
-import eu.ill.visa.cloud.providers.web.converters.ImageConverter;
-import eu.ill.visa.cloud.providers.web.converters.InstanceConverter;
-import eu.ill.visa.cloud.providers.web.converters.InstanceIdentifierConverter;
+import eu.ill.visa.cloud.providers.web.converters.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,8 +134,8 @@ public class WebProvider implements CloudProvider {
         // Remove obsolete security groups one by one
         for (String securityGroupName : securityGroupNamesToRemove) {
             final String json = createObjectBuilder().add("name", securityGroupName).build().toString();
-            final String removeActionUrl = format("%s/api/instances/%s/security_groups", configuration.getUrl(), id);
-            final HttpResponse removeActionResponse = httpClient.sendRequest(removeActionUrl, DELETE, headers, json);
+            final String removeActionUrl = format("%s/api/instances/%s/security_groups/remove", configuration.getUrl(), id);
+            final HttpResponse removeActionResponse = httpClient.sendRequest(removeActionUrl, POST, headers, json);
             if (!removeActionResponse.isSuccessful()) {
                 logger.warn("Could not remove security group '{}' from the server id {} and response {}", securityGroupName, id, response.getBody());
             }
@@ -331,5 +327,21 @@ public class WebProvider implements CloudProvider {
         }
         final JsonObject results = parseObject(response.getBody());
         return LimitConverter.fromJson(results);
+    }
+
+    @Override
+    public List<String> securityGroups() throws CloudException {
+        final String url = format("%s/api/security_groups", configuration.getUrl());
+        final Map<String, String> headers = new HashMap<>() {{
+            put(HEADER_X_AUTH_TOKEN, configuration.getAuthToken());
+        }};
+        final HttpResponse response = httpClient.sendRequest(url, GET, headers);
+        if (!response.isSuccessful()) {
+            logger.warn("Could not get security groups: {}", response.getBody());
+        }
+        final JsonArray currentSecurityGroups = parseArray(response.getBody());
+        return IntStream.range(0, currentSecurityGroups.size())
+            .mapToObj(currentSecurityGroups::getString)
+            .collect(toUnmodifiableList());
     }
 }

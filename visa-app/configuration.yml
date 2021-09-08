@@ -92,6 +92,7 @@ cloud:
     identityEndpoint: ${VISA_CLOUD_IDENTITY_ENDPOINT}
     computeEndpoint: ${VISA_CLOUD_COMPUTE_ENDPOINT}
     imageEndpoint: ${VISA_CLOUD_IMAGE_ENDPOINT}
+    networkEndpoint: ${VISA_CLOUD_NETWORK_ENDPOINT}
     applicationId: ${VISA_CLOUD_APPLICATION_ID}
     applicationSecret: ${VISA_CLOUD_APPLICATION_SECRET}
     addressProvider: ${VISA_CLOUD_ADDRESS_PROVIDER}

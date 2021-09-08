@@ -16,17 +16,19 @@ import java.util.stream.Collectors;
 import static eu.ill.visa.cloud.helpers.JsonHelper.parseObject;
 import static eu.ill.visa.cloud.http.HttpMethod.*;
 import static java.lang.String.format;
+import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static javax.json.Json.createArrayBuilder;
 import static javax.json.Json.createObjectBuilder;
 
 public class OpenStackProvider implements CloudProvider {
 
-    private static final Logger logger              = LoggerFactory.getLogger(OpenStackProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpenStackProvider.class);
 
-    private static final String HEADER_X_SUBJECT_TOKEN = "X-Subject-Token";
-    private static final String HEADER_X_AUTH_TOKEN = "X-Auth-Token";
-    private final HttpClient httpClient;
-    private final OpenStackProviderConfiguration configuration;
+    private static final String                         HEADER_X_SUBJECT_TOKEN = "X-Subject-Token";
+    private static final String                         HEADER_X_AUTH_TOKEN    = "X-Auth-Token";
+    private final        HttpClient                     httpClient;
+    private final        OpenStackProviderConfiguration configuration;
 
     public OpenStackProvider(final HttpClient httpClient, final OpenStackProviderConfiguration configuration) {
         this.httpClient = httpClient;
@@ -231,9 +233,9 @@ public class OpenStackProvider implements CloudProvider {
             logger.warn("Could not get security groups from the server with id {} and response {}", id, response.getBody());
         }
         final JsonArray currentSecurityGroups = parseObject(response.getBody()).getJsonArray("security_groups");
-        final List<String> currentSecurityGroupNames = currentSecurityGroups.stream().map(jsonValue -> jsonValue.asJsonObject().getString("name")).collect(Collectors.toUnmodifiableList());
-        List<String> securityGroupNamesToRemove = currentSecurityGroupNames.stream().filter(name -> !securityGroupNames.contains(name)).collect(Collectors.toUnmodifiableList());
-        List<String> securityGroupNamesToAdd = securityGroupNames.stream().filter(name -> !currentSecurityGroupNames.contains(name)).collect(Collectors.toUnmodifiableList());
+        final List<String> currentSecurityGroupNames = currentSecurityGroups.stream().map(jsonValue -> jsonValue.asJsonObject().getString("name")).collect(toUnmodifiableList());
+        List<String> securityGroupNamesToRemove = currentSecurityGroupNames.stream().filter(name -> !securityGroupNames.contains(name)).collect(toUnmodifiableList());
+        List<String> securityGroupNamesToAdd = securityGroupNames.stream().filter(name -> !currentSecurityGroupNames.contains(name)).collect(toUnmodifiableList());
 
         logger.info("Updating instance {} security groups: removing [{}] and adding [{}]", id, String.join(", ", securityGroupNamesToRemove), String.join(", ", securityGroupNamesToAdd));
 
@@ -269,7 +271,7 @@ public class OpenStackProvider implements CloudProvider {
                                         final String bootCommand) throws CloudException {
 
         final List<JsonObject> securityGroupObjects = securityGroupNames.stream().map(securityGroupName ->
-            createObjectBuilder().add("name", securityGroupName).build()).collect(Collectors.toUnmodifiableList());
+            createObjectBuilder().add("name", securityGroupName).build()).collect(toUnmodifiableList());
 
         final JsonArrayBuilder securityGroupsBuilder = createArrayBuilder();
         securityGroupObjects.forEach(securityGroupsBuilder::add);
@@ -332,5 +334,20 @@ public class OpenStackProvider implements CloudProvider {
         return LimitConverter.fromJson(results);
     }
 
+    @Override
+    public List<String> securityGroups() throws CloudException {
+        final String url = format("%s/v2.0/security-groups", configuration.getNetworkEndpoint());
+        final String authToken = authenticate();
+        final Map<String, String> headers = buildDefaultHeaders(authToken);
+        final HttpResponse response = httpClient.sendRequest(url, GET, headers);
+        if (!response.isSuccessful()) {
+            logger.warn("Could not get security groups: {}", response.getBody());
+            return new ArrayList<>();
+        }
+        final JsonArray currentSecurityGroups = parseObject(response.getBody()).getJsonArray("security_groups");
+        return currentSecurityGroups.stream().map(jsonValue -> jsonValue.asJsonObject().getString("name"))
+            .sorted(String::compareToIgnoreCase)
+            .collect(toUnmodifiableList());
+    }
 
 }
