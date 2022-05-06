@@ -3,11 +3,15 @@ package eu.ill.visa.business.services;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
+import eu.ill.visa.cloud.exceptions.CloudException;
+import eu.ill.visa.cloud.http.HttpClient;
 import eu.ill.visa.core.domain.*;
 import eu.ill.visa.persistence.repositories.FlavourRepository;
+import static eu.ill.visa.cloud.http.HttpMethod.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNullElseGet;
 
@@ -16,6 +20,7 @@ import static java.util.Objects.requireNonNullElseGet;
 public class FlavourService {
 
     private FlavourRepository repository;
+    private HttpClient client;
 
     @Inject
     public FlavourService(FlavourRepository repository) {

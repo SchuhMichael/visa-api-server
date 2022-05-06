@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class CloudConfiguration {
 
     private String provider;
 
-    private Map<String, String> parameters;
+    private List<ProviderConfiguration> providers;
 
     private String serverNamePrefix;
 
@@ -31,14 +33,8 @@ public class CloudConfiguration {
         this.provider = provider;
     }
 
-    @JsonProperty
     public Map<String, String> getParameters() {
-        return parameters;
-    }
-
-    @JsonProperty
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+        return providers.stream().filter(providerConfiguration -> providerConfiguration.getName().equals(provider)).findFirst().get().getParameters();
     }
 
     @JsonProperty
@@ -46,5 +42,15 @@ public class CloudConfiguration {
     @Valid
     public String getServerNamePrefix() {
         return serverNamePrefix;
+    }
+
+    @JsonProperty
+    public List<ProviderConfiguration> getProviders() {
+        return providers;
+    }
+
+    @JsonProperty
+    public void setProviders(List<ProviderConfiguration> providers) {
+        this.providers = providers;
     }
 }

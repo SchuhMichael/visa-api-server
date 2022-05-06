@@ -273,7 +273,7 @@ public class WebProvider implements CloudProvider {
         final Map<String, String> headers = new HashMap<>() {{
             put(HEADER_X_AUTH_TOKEN, configuration.getAuthToken());
         }};
-        final HttpResponse response = httpClient.sendRequest(url, POST, headers);
+        final HttpResponse response = httpClient.sendRequest(url, POST, headers, "");
         if (!response.isSuccessful()) {
             throw new CloudException(format("Could not reboot server with id %s and response %s: ", id, response.getBody()));
         }
@@ -285,7 +285,7 @@ public class WebProvider implements CloudProvider {
         final Map<String, String> headers = new HashMap<>() {{
             put(HEADER_X_AUTH_TOKEN, configuration.getAuthToken());
         }};
-        final HttpResponse response = httpClient.sendRequest(url, POST, headers);
+        final HttpResponse response = httpClient.sendRequest(url, POST, headers, "");
         if (!response.isSuccessful()) {
             throw new CloudException(format("Could not shutdown server with id %s and response %s: ", id, response.getBody()));
         }
@@ -297,7 +297,7 @@ public class WebProvider implements CloudProvider {
         final Map<String, String> headers = new HashMap<>() {{
             put(HEADER_X_AUTH_TOKEN, configuration.getAuthToken());
         }};
-        final HttpResponse response = httpClient.sendRequest(url, POST, headers);
+        final HttpResponse response = httpClient.sendRequest(url, POST, headers, "");
         if (!response.isSuccessful()) {
             throw new CloudException(format("Could not start server with id %s and response %s: ", id, response.getBody()));
         }
