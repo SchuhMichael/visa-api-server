@@ -127,7 +127,7 @@ public class DesktopAccessService {
     private SocketIOClient getDesktopOwner(Collection<SocketIOClient> clients) {
 
         for (final SocketIOClient aClient : clients) {
-            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberBySessionId(aClient.getSessionId());
+            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberBySessionId(aClient.getSessionId().toString());
             if (instanceSessionMember != null && instanceSessionMember.getRole().equals("OWNER")) {
                 return aClient;
             }

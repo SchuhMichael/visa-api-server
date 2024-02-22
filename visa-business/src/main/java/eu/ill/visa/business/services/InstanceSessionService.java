@@ -63,8 +63,8 @@ public class InstanceSessionService {
         this.repository.save(instanceSession);
     }
 
-    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID sessionId, User user, String role) {
-        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, sessionId.toString(), user, role);
+    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, String sessionId, User user, String role) {
+        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, sessionId, user, role);
         sessionMember.setActive(true);
 
         this.instanceSessionMemberRepository.save(sessionMember);
@@ -101,8 +101,8 @@ public class InstanceSessionService {
         return this.instanceSessionMemberRepository.getAllSessionMembers(instance);
     }
 
-    public InstanceSessionMember getSessionMemberBySessionId(UUID sessionId) {
-        return this.instanceSessionMemberRepository.getBySessionId(sessionId.toString());
+    public InstanceSessionMember getSessionMemberBySessionId(String sessionId) {
+        return this.instanceSessionMemberRepository.getBySessionId(sessionId);
     }
 
     public void saveInstanceSessionMember(InstanceSessionMember instanceSessionMember) {

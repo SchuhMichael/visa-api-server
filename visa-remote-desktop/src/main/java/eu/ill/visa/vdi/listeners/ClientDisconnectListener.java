@@ -39,7 +39,7 @@ public class ClientDisconnectListener extends AbstractListener implements Discon
 
     @Override
     public void onDisconnect(final SocketIOClient client) {
-        final DesktopConnection connection = this.getDesktopConnection(client);
+        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
 
         if (connection != null) {
             connection.getConnectionThread().closeTunnel();
@@ -67,7 +67,7 @@ public class ClientDisconnectListener extends AbstractListener implements Discon
                 } else {
                     // broadcast events for a user disconnected and current users
                     this.broadcast(client,
-                        new UserDisconnectedEvent(this.getConnectedUser(client)),
+                        new UserDisconnectedEvent(this.getConnectedUser(client.getSessionId().toString())),
                         new UsersConnectedEvent(instance, this.getConnectedUsers(instance, false))
                     );
                 }
@@ -77,7 +77,7 @@ public class ClientDisconnectListener extends AbstractListener implements Discon
                 this.desktopConnectionService.disconnectAllRoomClients(client, connection.getRoomId());
             }
 
-            this.removeDesktopConnection(client);
+            this.removeDesktopConnection(client.getSessionId().toString());
 
         } else {
             this.desktopAccessService.cancelAccess(client);

@@ -25,6 +25,8 @@ import eu.ill.webx.exceptions.WebXException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.websocket.Session;
+
 import static eu.ill.visa.vdi.domain.Role.OWNER;
 import static java.util.Objects.requireNonNullElse;
 
@@ -152,5 +154,10 @@ public class WebXDesktopService extends DesktopService {
     public ConnectionThread connect(SocketIOClient client, Instance instance, User user, Role role) throws OwnerNotConnectedException, ConnectionException {
         final WebXTunnel webXTunnel = this.createWebXTunnel(instance, user, role);
         return executorService.startWebXConnectionThread(client, webXTunnel, instance, user, role);
+    }
+
+    @Override
+    public ConnectionThread connect(Session session, Instance instance, User user, Role role) throws OwnerNotConnectedException, ConnectionException {
+        return null;
     }
 }

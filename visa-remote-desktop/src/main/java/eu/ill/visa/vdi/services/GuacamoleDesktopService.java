@@ -28,6 +28,7 @@ import org.apache.guacamole.protocol.GuacamoleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.websocket.Session;
 import java.util.Map;
 
 import static eu.ill.visa.vdi.domain.Role.OWNER;
@@ -175,5 +176,16 @@ public class GuacamoleDesktopService extends DesktopService {
 
         final GuacamoleTunnel guacamoleTunnel = new SimpleGuacamoleTunnel(guacamoleSocket);
         return executorService.startGuacamoleConnectionThread(client, guacamoleTunnel, instance, user, role);
+    }
+
+    @Override
+    public ConnectionThread connect(final Session session,
+                                    final Instance instance,
+                                    final User user,
+                                    final Role role) throws OwnerNotConnectedException, ConnectionException {
+        final GuacamoleSocket guacamoleSocket = this.createGuacamoleSocket(instance, user, role);
+
+        final GuacamoleTunnel guacamoleTunnel = new SimpleGuacamoleTunnel(guacamoleSocket);
+        return executorService.startGuacamoleWebsocketConnectionThread(session, guacamoleTunnel, instance, user, role);
     }
 }

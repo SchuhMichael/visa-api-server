@@ -27,6 +27,7 @@ import eu.ill.visa.vdi.support.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.websocket.Session;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class DesktopConnectionService {
     private final WebXDesktopService webXDesktopService;
     private final InstanceExpirationService instanceExpirationService;
     private final VirtualDesktopConfiguration virtualDesktopConfiguration;
-    private final Map<UUID, DesktopConnection> desktopConnections = new HashMap<>();
+    private final Map<String, DesktopConnection> desktopConnections = new HashMap<>();
     private final StoreFactory storeFactory;
 
     @Inject
@@ -62,7 +63,7 @@ public class DesktopConnectionService {
     }
 
     public void broadcast(final SocketIOClient client, final Event ...events) {
-        final DesktopConnection connection = this.getDesktopConnection(client);
+        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
         this.broadcast(client, connection.getRoomId(), events);
     }
 
@@ -99,7 +100,7 @@ public class DesktopConnectionService {
 
         ConnectedUser connectedUser = new ConnectedUser(user.getId(), user.getFullName(), role);
         DesktopConnection desktopConnection = new DesktopConnection(instance.getId(), instance.getLastSeenAt(), connectedUser, thread, instance.getId().toString());
-        this.desktopConnections.put(client.getSessionId(), desktopConnection);
+        this.desktopConnections.put(client.getSessionId().toString(), desktopConnection);
 
         client.joinRoom(desktopConnection.getRoomId());
 
@@ -109,7 +110,7 @@ public class DesktopConnectionService {
             && !this.isOwnerConnected(instance);
 
         // Update the connected clients of the session
-        this.instanceSessionService.addInstanceSessionMember(instanceSession, client.getSessionId(), user, role.toString());
+        this.instanceSessionService.addInstanceSessionMember(instanceSession, client.getSessionId().toString(), user, role.toString());
 
         // Remove instance from instance_expiration table if it is there due to inactivity
         this.instanceExpirationService.onInstanceActivated(instanceSession.getInstance());
@@ -120,7 +121,7 @@ public class DesktopConnectionService {
 
         } else {
             this.broadcast(client,
-                new UserConnectedEvent(this.getConnectedUser(client)),
+                new UserConnectedEvent(this.getConnectedUser(client.getSessionId().toString())),
                 new UsersConnectedEvent(instance, this.getConnectedUsers(instance, false))
             );
         }
@@ -128,18 +129,67 @@ public class DesktopConnectionService {
         return desktopConnection;
     }
 
-    public DesktopConnection getDesktopConnection(final SocketIOClient client) {
-        final DesktopConnection desktopConnection = this.desktopConnections.get(client.getSessionId());
+    public DesktopConnection createDesktopConnection(final Session session, final Instance instance, final User user, final Role role) throws OwnerNotConnectedException, UnauthorizedException, ConnectionException {
+        if (role == Role.NONE) {
+            throw new UnauthorizedException("User " + user.getFullName() + " is unauthorised to access the instance " + instance.getId());
+        }
+
+        final Map<String, List<String>> data = session.getRequestParameterMap();
+        final String protocol = data.get(PROTOCOL_PARAMETER).get(0);
+
+        boolean isWebX = protocol != null && protocol.equals("webx");
+        final ConnectionThread thread;
+        if (isWebX) {
+            logger.info("User {} creating WebX desktop connection to instance {}", (user.getFullName() + "(" + role.toString() + ")"), instance.getId());
+            thread = webXDesktopService.connect(session, instance, user, role);
+        } else {
+            logger.info("User {} creating Guacamole desktop connection to instance {}", (user.getFullName() + "(" + role.toString() + ")"), instance.getId());
+            thread = guacamoleDesktopService.connect(session, instance, user, role);
+        }
+
+        ConnectedUser connectedUser = new ConnectedUser(user.getId(), user.getFullName(), role);
+        DesktopConnection desktopConnection = new DesktopConnection(instance.getId(), instance.getLastSeenAt(), connectedUser, thread, instance.getId().toString());
+        this.desktopConnections.put(session.getId(), desktopConnection);
+
+//        client.joinRoom(desktopConnection.getRoomId());
+
+        InstanceSession instanceSession = this.instanceSessionService.getByInstance(instance);
+        boolean unlockRoom = virtualDesktopConfiguration.getOwnerDisconnectionPolicy().equals(VirtualDesktopConfiguration.OWNER_DISCONNECTION_POLICY_LOCK_ROOM)
+            && role.equals(Role.OWNER)
+            && !this.isOwnerConnected(instance);
+
+        // Update the connected clients of the session
+        this.instanceSessionService.addInstanceSessionMember(instanceSession, session.getId(), user, role.toString());
+
+        // Remove instance from instance_expiration table if it is there due to inactivity
+        this.instanceExpirationService.onInstanceActivated(instanceSession.getInstance());
+
+//        if (unlockRoom) {
+//            // Unlock room for all clients
+//            this.unlockRoom(client, desktopConnection.getRoomId(), instance);
+//
+//        } else {
+//            this.broadcast(client,
+//                new UserConnectedEvent(this.getConnectedUser(client)),
+//                new UsersConnectedEvent(instance, this.getConnectedUsers(instance, false))
+//            );
+//        }
 
         return desktopConnection;
     }
 
-    public void removeDesktopConnection(final SocketIOClient client) {
-        this.desktopConnections.remove(client.getSessionId());
+    public DesktopConnection getDesktopConnection(final String clientId) {
+        final DesktopConnection desktopConnection = this.desktopConnections.get(clientId);
+
+        return desktopConnection;
     }
 
-    public ConnectedUser getConnectedUser(final SocketIOClient client) {
-        final DesktopConnection desktopConnection = this.getDesktopConnection(client);
+    public void removeDesktopConnection(final String clientId) {
+        this.desktopConnections.remove(clientId);
+    }
+
+    public ConnectedUser getConnectedUser(final String clientId) {
+        final DesktopConnection desktopConnection = this.getDesktopConnection(clientId);
         return desktopConnection.getConnectedUser();
     }
 
@@ -196,7 +246,7 @@ public class DesktopConnectionService {
         );
 
         for (final SocketIOClient aClient : clients) {
-            DesktopConnection connection = this.getDesktopConnection(aClient);
+            DesktopConnection connection = this.getDesktopConnection(aClient.getSessionId().toString());
             connection.setRoomLocked(true);
         }
     }
@@ -214,7 +264,7 @@ public class DesktopConnectionService {
         );
 
         for (final SocketIOClient aClient : clients) {
-            DesktopConnection connection = this.getDesktopConnection(aClient);
+            DesktopConnection connection = this.getDesktopConnection(aClient.getSessionId().toString());
             connection.setRoomLocked(false);
         }
     }

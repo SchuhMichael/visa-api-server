@@ -8,6 +8,10 @@ import eu.ill.visa.core.domain.InstanceAuthenticationToken;
 import eu.ill.visa.vdi.exceptions.InvalidTokenException;
 import eu.ill.visa.vdi.support.HttpRequest;
 
+import javax.websocket.Session;
+import java.util.List;
+import java.util.Map;
+
 public class TokenAuthenticatorService {
     private final static String TOKEN_PARAMETER = "token";
     private final InstanceAuthenticationTokenService instanceAuthenticationTokenService;
@@ -21,6 +25,27 @@ public class TokenAuthenticatorService {
         final HandshakeData data = client.getHandshakeData();
         final HttpRequest request = new HttpRequest(data);
         final String token = request.getStringParameter(TOKEN_PARAMETER);
+
+        if (token == null) {
+            throw new InvalidTokenException("Could not find or session ticket is invalid");
+        }
+
+        final InstanceAuthenticationToken authenticationToken = instanceAuthenticationTokenService.getByToken(token);
+
+        if (authenticationToken == null) {
+            throw new InvalidTokenException("Authentication session ticket not found");
+        }
+
+        if (authenticationToken.isExpired(10)) {
+            throw new InvalidTokenException("Authentication session ticket has expired");
+        }
+
+        return authenticationToken;
+    }
+
+    public InstanceAuthenticationToken authenticate(final Session session) throws InvalidTokenException {
+        final Map<String, List<String>> data = session.getRequestParameterMap();
+        final String token = data.get(TOKEN_PARAMETER).get(0);
 
         if (token == null) {
             throw new InvalidTokenException("Could not find or session ticket is invalid");

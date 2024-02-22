@@ -36,7 +36,7 @@ public class ClientAccessRevokedCommandListener extends AbstractListener impleme
 
     @Override
     public void onData(final SocketIOClient client, final AccessRevokedCommand command, final AckRequest ackRequest) {
-        final DesktopConnection connection = this.getDesktopConnection(client);
+        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
 
         if (connection != null) {
             if (connection.getConnectedUser().getRole().equals(Role.OWNER)) {

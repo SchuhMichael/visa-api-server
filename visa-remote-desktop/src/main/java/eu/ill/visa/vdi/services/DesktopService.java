@@ -11,6 +11,8 @@ import eu.ill.visa.vdi.domain.Role;
 import eu.ill.visa.vdi.exceptions.ConnectionException;
 import eu.ill.visa.vdi.exceptions.OwnerNotConnectedException;
 
+import javax.websocket.Session;
+
 public abstract class DesktopService {
 
     private final CloudClientGateway cloudClientGateway;
@@ -20,6 +22,11 @@ public abstract class DesktopService {
     }
 
     public abstract ConnectionThread connect(final SocketIOClient client,
+                                             final Instance instance,
+                                             final User user,
+                                             final Role role) throws OwnerNotConnectedException, ConnectionException;
+
+    public abstract ConnectionThread connect(final Session session,
                                              final Instance instance,
                                              final User user,
                                              final Role role) throws OwnerNotConnectedException, ConnectionException;

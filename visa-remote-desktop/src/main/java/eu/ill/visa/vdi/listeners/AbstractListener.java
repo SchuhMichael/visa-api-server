@@ -21,16 +21,16 @@ public class AbstractListener {
         this.desktopConnectionService.broadcast(client, events);
     }
 
-    public DesktopConnection getDesktopConnection(final SocketIOClient client) {
-        return this.desktopConnectionService.getDesktopConnection(client);
+    public DesktopConnection getDesktopConnection(final String clientId) {
+        return this.desktopConnectionService.getDesktopConnection(clientId);
     }
 
-    public void removeDesktopConnection(final SocketIOClient client) {
-        this.desktopConnectionService.removeDesktopConnection(client);
+    public void removeDesktopConnection(final String clientId) {
+        this.desktopConnectionService.removeDesktopConnection(clientId);
     }
 
-    public ConnectedUser getConnectedUser(final SocketIOClient client) {
-        return this.desktopConnectionService.getConnectedUser(client);
+    public ConnectedUser getConnectedUser(final String clientId) {
+        return this.desktopConnectionService.getConnectedUser(clientId);
     }
 
     public List<ConnectedUser> getConnectedUsers(Instance instance, boolean isRoomLocked) {

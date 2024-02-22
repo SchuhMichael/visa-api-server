@@ -8,6 +8,7 @@ import eu.ill.visa.vdi.domain.Role;
 import eu.ill.webx.WebXTunnel;
 import org.apache.guacamole.net.GuacamoleTunnel;
 
+import javax.websocket.Session;
 import java.util.concurrent.ExecutorService;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
@@ -25,9 +26,16 @@ public class ConnectionThreadExecutor {
         return thread;
     }
 
+    public ConnectionThread startGuacamoleWebsocketConnectionThread(Session session, GuacamoleTunnel tunnel, Instance instance, User user, Role role) {
+        final ConnectionThread thread = new GuacamoleWebsocketConnectionThread(session, tunnel, instance, user, role);
+
+        executorService.submit(thread);
+
+        return thread;
+    }
+
     public ConnectionThread startWebXConnectionThread(SocketIOClient client, WebXTunnel tunnel, Instance instance, User user, Role role) {
         final ConnectionThread thread = new WebXConnectionThread(client, tunnel, instance, user, role);
-
         executorService.submit(thread);
 
         return thread;
