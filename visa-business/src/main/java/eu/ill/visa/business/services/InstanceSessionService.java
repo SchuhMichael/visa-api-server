@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 @Transactional
 @Singleton
@@ -63,15 +62,15 @@ public class InstanceSessionService {
         this.repository.save(instanceSession);
     }
 
-    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, String sessionId, User user, String role) {
-        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, sessionId, user, role);
+    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, String connectionId, User user, String role) {
+        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, connectionId, user, role);
         sessionMember.setActive(true);
 
         this.instanceSessionMemberRepository.save(sessionMember);
     }
 
-    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID sessionId) {
-        InstanceSessionMember sessionMember = this.instanceSessionMemberRepository.getSessionMember(instanceSession, sessionId.toString());
+    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, String connectionId) {
+        InstanceSessionMember sessionMember = this.instanceSessionMemberRepository.getSessionMember(instanceSession, connectionId);
         if (sessionMember != null) {
             sessionMember.setActive(false);
             this.instanceSessionMemberRepository.save(sessionMember);
@@ -83,8 +82,6 @@ public class InstanceSessionService {
                 instanceSession.setCurrent(false);
             }
             this.repository.save(instanceSession);
-        } else {
-            logger.warn("Got a null session member (session {}) for instance {}", sessionId.toString(), instanceSession.getInstance().getId());
         }
     }
 
@@ -101,8 +98,8 @@ public class InstanceSessionService {
         return this.instanceSessionMemberRepository.getAllSessionMembers(instance);
     }
 
-    public InstanceSessionMember getSessionMemberBySessionId(String sessionId) {
-        return this.instanceSessionMemberRepository.getBySessionId(sessionId);
+    public InstanceSessionMember getSessionMemberByConnectionId(String connectionId) {
+        return this.instanceSessionMemberRepository.getByConnectionId(connectionId);
     }
 
     public void saveInstanceSessionMember(InstanceSessionMember instanceSessionMember) {

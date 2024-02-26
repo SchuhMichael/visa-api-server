@@ -7,6 +7,7 @@ import com.corundumstudio.socketio.store.StoreFactory;
 import com.corundumstudio.socketio.store.pubsub.DispatchMessage;
 import com.corundumstudio.socketio.store.pubsub.PubSubType;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import eu.ill.visa.business.services.InstanceActivityService;
 import eu.ill.visa.business.services.InstanceService;
 import eu.ill.visa.business.services.InstanceSessionService;
@@ -21,9 +22,10 @@ import eu.ill.visa.vdi.services.TokenAuthenticatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoteDesktopServer {
+@Singleton
+public class DesktopConnectionApplication {
 
-    private final static Logger logger = LoggerFactory.getLogger(RemoteDesktopServer.class);
+    private final static Logger logger = LoggerFactory.getLogger(DesktopConnectionApplication.class);
 
     private final SocketIOServer server;
     private final Configuration configuration;
@@ -37,16 +39,16 @@ public class RemoteDesktopServer {
     private final VirtualDesktopConfiguration virtualDesktopConfiguration;
 
     @Inject
-    public RemoteDesktopServer(final SocketIOServer server,
-                               final InstanceSessionService instanceSessionService,
-                               final DesktopConnectionService desktopConnectionService,
-                               final InstanceService instanceService,
-                               final TokenAuthenticatorService authenticator,
-                               final RoleService roleService,
-                               final DesktopAccessService desktopAccessService,
-                               final Configuration configuration,
-                               final VirtualDesktopConfiguration virtualDesktopConfiguration,
-                               final InstanceActivityService instanceActivityService) {
+    public DesktopConnectionApplication(final SocketIOServer server,
+                                        final InstanceSessionService instanceSessionService,
+                                        final DesktopConnectionService desktopConnectionService,
+                                        final InstanceService instanceService,
+                                        final TokenAuthenticatorService authenticator,
+                                        final RoleService roleService,
+                                        final DesktopAccessService desktopAccessService,
+                                        final Configuration configuration,
+                                        final VirtualDesktopConfiguration virtualDesktopConfiguration,
+                                        final InstanceActivityService instanceActivityService) {
         this.server = server;
         this.configuration = configuration;
         this.instanceSessionService = instanceSessionService;
@@ -77,8 +79,6 @@ public class RemoteDesktopServer {
 
     private void bindListeners(final SocketIOServer server) {
         server.addConnectListener(new ClientConnectListener(this.desktopConnectionService, this.desktopAccessService, this.instanceSessionService, this.roleService, this.authenticator));
-        server.addEventListener("display", String.class, new GuacamoleClientDisplayListener(this.desktopConnectionService, this.instanceService, this.instanceSessionService, this.instanceActivityService));
-        server.addEventListener("webxdisplay", byte[].class, new WebXClientDisplayListener(this.desktopConnectionService, this.instanceService, this.instanceSessionService, this.instanceActivityService));
         server.addEventListener("thumbnail", byte[].class, new ClientThumbnailListener(this.desktopConnectionService, this.instanceService));
         server.addEventListener(Event.ACCESS_REPLY_EVENT, AccessReply.class, new ClientAccessReplyListener(this.desktopAccessService));
         server.addEventListener(Event.ACCESS_REVOKED_EVENT, AccessRevokedCommand.class, new ClientAccessRevokedCommandListener(this.desktopConnectionService, this.instanceSessionService, this.instanceService));

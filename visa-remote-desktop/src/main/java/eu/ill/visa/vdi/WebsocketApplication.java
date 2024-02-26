@@ -6,7 +6,6 @@ import eu.ill.visa.business.services.InstanceActivityService;
 import eu.ill.visa.business.services.InstanceService;
 import eu.ill.visa.business.services.InstanceSessionService;
 import eu.ill.visa.vdi.endpoints.GuacamoleEndpoint;
-import eu.ill.visa.vdi.services.DesktopAccessService;
 import eu.ill.visa.vdi.services.DesktopConnectionService;
 import eu.ill.visa.vdi.services.RoleService;
 import eu.ill.visa.vdi.services.TokenAuthenticatorService;
@@ -21,7 +20,6 @@ import javax.websocket.server.ServerEndpointConfig;
 public class WebsocketApplication {
 
     private final DesktopConnectionService desktopConnectionService;
-    private final DesktopAccessService desktopAccessService;
     private final InstanceService instanceService;
     private final InstanceActivityService instanceActivityService;
     private final InstanceSessionService instanceSessionService;
@@ -31,14 +29,12 @@ public class WebsocketApplication {
 
     @Inject
     public WebsocketApplication(final DesktopConnectionService desktopConnectionService,
-                                final DesktopAccessService desktopAccessService,
                                 final InstanceService instanceService,
                                 final InstanceActivityService instanceActivityService,
                                 final InstanceSessionService instanceSessionService,
                                 final RoleService roleService,
                                 final TokenAuthenticatorService authenticator) {
         this.desktopConnectionService = desktopConnectionService;
-        this.desktopAccessService = desktopAccessService;
         this.instanceService = instanceService;
         this.instanceActivityService = instanceActivityService;
         this.instanceSessionService = instanceSessionService;
@@ -64,7 +60,7 @@ public class WebsocketApplication {
                         // Add WebSocket endpoint to javax.websocket layer
                         wsContainer.addEndpoint(ServerEndpointConfig.Builder
                                 .create(GuacamoleEndpoint.class, "/socket")
-                                .configurator(new GuacamoleEndpoint.Configurator(this.desktopConnectionService, this.desktopAccessService, this.instanceService, this.instanceActivityService, this.instanceSessionService, this.roleService, this.authenticator))
+                                .configurator(new GuacamoleEndpoint.Configurator(this.desktopConnectionService, this.instanceService, this.instanceActivityService, this.instanceSessionService, this.roleService, this.authenticator))
                                 .build());
                     });
 

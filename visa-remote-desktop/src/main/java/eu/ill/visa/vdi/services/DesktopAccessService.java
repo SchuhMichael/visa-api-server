@@ -48,16 +48,16 @@ public class DesktopAccessService {
         this.instanceService = instanceService;
     }
 
-    private DesktopCandidate addCandidate(SocketIOClient client, User user, Instance instance) {
-        DesktopCandidate desktopCandidate = new DesktopCandidate(client, user, instance.getId());
+    private DesktopCandidate addCandidate(String connectionId, SocketIOClient client, User user, Instance instance) {
+        DesktopCandidate desktopCandidate = new DesktopCandidate(connectionId, client, user, instance.getId());
         this.desktopCandidates.put(client.getSessionId(), desktopCandidate);
 
         return desktopCandidate;
     }
 
-    public void initiateAccess(SocketIOClient client, User user, Instance instance) {
+    public void initiateAccess(String connectionId, SocketIOClient client, User user, Instance instance) {
         // Create pending desktop connection
-        DesktopCandidate desktopCandidate = this.addCandidate(client, user, instance);
+        DesktopCandidate desktopCandidate = this.addCandidate(connectionId, client, user, instance);
 
         // Get room Id from connection
         String room = desktopCandidate.getRoomId();
@@ -127,7 +127,7 @@ public class DesktopAccessService {
     private SocketIOClient getDesktopOwner(Collection<SocketIOClient> clients) {
 
         for (final SocketIOClient aClient : clients) {
-            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberBySessionId(aClient.getSessionId().toString());
+            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(aClient.getSessionId().toString());
             if (instanceSessionMember != null && instanceSessionMember.getRole().equals("OWNER")) {
                 return aClient;
             }
@@ -215,6 +215,7 @@ public class DesktopAccessService {
 
     private void connectFromAccessReply(DesktopCandidate candidate, Role replyRole) {
 
+        String connectionId = candidate.getConnectionId();
         SocketIOClient client = candidate.getClient();
         if (client.isChannelOpen()) {
 
@@ -225,7 +226,7 @@ public class DesktopAccessService {
                 // Convert the support role to a normal user one if the owner of the instance is staff
                 Role role = this.convertAccessReplyRole(replyRole, instance, user);
                 try {
-                    this.desktopConnectionService.createDesktopConnection(client, instance, user, role);
+                    this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
 
                     client.sendEvent(Event.ACCESS_GRANTED_EVENT, role);
 

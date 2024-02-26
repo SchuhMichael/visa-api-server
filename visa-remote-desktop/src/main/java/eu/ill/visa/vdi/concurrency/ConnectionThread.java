@@ -22,6 +22,10 @@ public abstract class ConnectionThread implements Runnable {
         this.role = role;
     }
 
+    public String getClientId() {
+        return clientId;
+    }
+
     public abstract void closeTunnel();
 
     public abstract void run();

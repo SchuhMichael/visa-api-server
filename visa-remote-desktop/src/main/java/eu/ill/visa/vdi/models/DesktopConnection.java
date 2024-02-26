@@ -1,5 +1,6 @@
 package eu.ill.visa.vdi.models;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import eu.ill.visa.core.domain.enumerations.InstanceActivityType;
 import eu.ill.visa.vdi.concurrency.ConnectionThread;
 
@@ -7,21 +8,32 @@ import java.util.Date;
 
 public class DesktopConnection {
 
+    private final String connectionId;
+    private final SocketIOClient client;
     private final Long instanceId;
     private Date lastSeenAt;
     private Date lastInteractionAt = new Date();
     private InstanceActivityType instanceActivityType;
     private final ConnectedUser connectedUser;
-    private final ConnectionThread connectionThread;
+    private ConnectionThread connectionThread;
     private final String roomId;
     private boolean isRoomLocked = false;
 
-    public DesktopConnection(Long instanceId, Date lastSeenAt, final ConnectedUser connectedUser, final ConnectionThread connectionThread, String roomId) {
+    public DesktopConnection(String connectionId, SocketIOClient client, Long instanceId, Date lastSeenAt, final ConnectedUser connectedUser, String roomId) {
+        this.connectionId = connectionId;
+        this.client = client;
         this.instanceId = instanceId;
         this.lastSeenAt = lastSeenAt;
         this.connectedUser = connectedUser;
-        this.connectionThread = connectionThread;
         this.roomId = roomId;
+    }
+
+    public String getConnectionId() {
+        return connectionId;
+    }
+
+    public SocketIOClient getClient() {
+        return client;
     }
 
     public Long getInstanceId() {
@@ -75,6 +87,10 @@ public class DesktopConnection {
 
     public ConnectionThread getConnectionThread() {
         return connectionThread;
+    }
+
+    public void setConnectionThread(ConnectionThread connectionThread) {
+        this.connectionThread = connectionThread;
     }
 
     public String getRoomId() {

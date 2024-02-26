@@ -5,30 +5,28 @@ import eu.ill.visa.core.domain.User;
 
 public class DesktopCandidate {
 
-    private SocketIOClient client;
-    private User user;
-    private Long instanceId;
+    private final String connectionId;
+    private final SocketIOClient client;
+    private final User user;
+    private final Long instanceId;
 
-    public DesktopCandidate(SocketIOClient client, User user, Long instanceId) {
+    public DesktopCandidate(String connectionId, SocketIOClient client, User user, Long instanceId) {
+        this.connectionId = connectionId;
         this.client = client;
         this.user = user;
         this.instanceId = instanceId;
+    }
+
+    public String getConnectionId() {
+        return connectionId;
     }
 
     public SocketIOClient getClient() {
         return client;
     }
 
-    public void setClient(SocketIOClient client) {
-        this.client = client;
-    }
-
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getRoomId() {
@@ -37,9 +35,5 @@ public class DesktopCandidate {
 
     public Long getInstanceId() {
         return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
     }
 }

@@ -19,8 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static eu.ill.visa.vdi.domain.Role.SUPPORT;
-import static eu.ill.visa.vdi.events.Event.ACCESS_DENIED;
-import static eu.ill.visa.vdi.events.Event.OWNER_AWAY_EVENT;
+import static eu.ill.visa.vdi.events.Event.*;
 
 public class ClientConnectListener extends AbstractListener implements ConnectListener {
 
@@ -45,9 +44,10 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
     @Override
     public void onConnect(final SocketIOClient client) {
         try {
-            logger.info("Initialising websocket client with session id: {}", client.getSessionId());
-
             final InstanceAuthenticationToken token = authenticator.authenticate(client);
+            final String connectionId = token.getToken();
+
+            logger.info("Initialising websocket client with session id: {} and connectionId {}", client.getSessionId(), connectionId);
 
             final User user = token.getUser();
             final Instance instance = token.getInstance();
@@ -61,12 +61,13 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
                 if (role.equals(SUPPORT)) {
                     // See if user can connect even if owner is away
                     if (this.instanceSessionService.canConnectWhileOwnerAway(instance, user)) {
-                        this.desktopConnectionService.createDesktopConnection(client, instance, user, role);
+                        this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
+                        client.sendEvent(CONNECTED_EVENT);
 
                     } else {
                         if (this.desktopConnectionService.isOwnerConnected(instance)) {
                             // Start process of requesting access from the owner
-                            this.desktopAccessService.initiateAccess(client, user, instance);
+                            this.desktopAccessService.initiateAccess(connectionId, client, user, instance);
 
                         } else {
                             throw new OwnerNotConnectedException();
@@ -74,7 +75,9 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
                     }
 
                 } else {
-                    this.desktopConnectionService.createDesktopConnection(client, instance, user, role);
+                    this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
+                    client.sendEvent(CONNECTED_EVENT);
+                    client.sendEvent(USER_CONNECTED_EVENT);
                 }
             }
 

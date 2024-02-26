@@ -5,13 +5,17 @@ import com.corundumstudio.socketio.SocketIOClient;
 
 public abstract class Event {
 
+    public static final String CONNECTED_EVENT = "connecticles";
+
     public static final String USER_CONNECTED_EVENT = "user:connected";
     public static final String USER_DISCONNECTED_EVENT = "user:disconnected";
     public static final String USERS_CONNECTED_EVENT = "users:connected";
     public static final String OWNER_AWAY_EVENT = "owner:away";
+
     public static final String ROOM_CLOSED_EVENT = "room:closed";
     public static final String ROOM_LOCKED_EVENT = "room:locked";
     public static final String ROOM_UNLOCKED_EVENT = "room:unlocked";
+
     public static final String ACCESS_DENIED = "access:denied";
     public static final String ACCESS_CANDIDATE_EVENT = "access:candidate";
     public static final String ACCESS_REQUEST_EVENT = "access:request";

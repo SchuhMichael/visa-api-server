@@ -1,7 +1,7 @@
 package eu.ill.visa.web.managed;
 
 import com.google.inject.Inject;
-import eu.ill.visa.vdi.VirtualDesktopApplication;
+import eu.ill.visa.vdi.DesktopConnectionApplication;
 import eu.ill.visa.vdi.VirtualDesktopConfiguration;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 
 public class ManagedVirtualDesktopServer implements Managed {
 
-    private final VirtualDesktopApplication application;
+    private final DesktopConnectionApplication application;
     private final VirtualDesktopConfiguration configuration;
     private final Logger logger = LoggerFactory.getLogger(ManagedVirtualDesktopServer.class);
 
     @Inject
-    public ManagedVirtualDesktopServer(final VirtualDesktopApplication application,
+    public ManagedVirtualDesktopServer(final DesktopConnectionApplication application,
                                        final VirtualDesktopConfiguration configuration) {
         this.application = application;
         this.configuration = configuration;

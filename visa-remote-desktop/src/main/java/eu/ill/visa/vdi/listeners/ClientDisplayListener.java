@@ -74,7 +74,7 @@ public abstract class ClientDisplayListener<T> extends AbstractListener implemen
 
                 instanceService.save(instance);
 
-                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberBySessionId(client.getSessionId().toString());
+                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(client.getSessionId().toString());
                 if (instanceSessionMember == null) {
                     logger.warn(format("Instance session member not found for instance %d", instanceId));
                 } else {

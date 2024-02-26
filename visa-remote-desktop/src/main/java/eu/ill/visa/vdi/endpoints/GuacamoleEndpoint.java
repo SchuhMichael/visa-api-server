@@ -15,7 +15,6 @@ import eu.ill.visa.vdi.exceptions.InvalidTokenException;
 import eu.ill.visa.vdi.exceptions.OwnerNotConnectedException;
 import eu.ill.visa.vdi.exceptions.UnauthorizedException;
 import eu.ill.visa.vdi.models.DesktopConnection;
-import eu.ill.visa.vdi.services.DesktopAccessService;
 import eu.ill.visa.vdi.services.DesktopConnectionService;
 import eu.ill.visa.vdi.services.RoleService;
 import eu.ill.visa.vdi.services.TokenAuthenticatorService;
@@ -27,42 +26,49 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static eu.ill.visa.vdi.domain.Role.SUPPORT;
 import static java.lang.String.format;
 
-@ServerEndpoint(value = "/socket", subprotocols = "guacamole")
+@ServerEndpoint(value = "/socket", subprotocols = {"guacamole", "webx"})
 public class GuacamoleEndpoint {
+    private final static String CONNECTION_ID_PARAMETER = "connectionId";
+
     private static final Logger logger = LoggerFactory.getLogger(GuacamoleEndpoint.class);
 
     private final DesktopConnectionService desktopConnectionService;
-    private final DesktopAccessService desktopAccessService;
     private final InstanceService instanceService;
     private final InstanceActivityService instanceActivityService;
     private final InstanceSessionService instanceSessionService;
     private final RoleService roleService;
     private final TokenAuthenticatorService authenticator;
 
+    private Map<String, String> sessionConnectionIds = new HashMap<>();
+
     public GuacamoleEndpoint(final DesktopConnectionService desktopConnectionService,
-                             final DesktopAccessService desktopAccessService,
                              final InstanceService instanceService,
                              final InstanceActivityService instanceActivityService,
                              final InstanceSessionService instanceSessionService,
                              final RoleService roleService,
                              final TokenAuthenticatorService authenticator) {
         this.desktopConnectionService = desktopConnectionService;
-        this.desktopAccessService = desktopAccessService;
         this.instanceService = instanceService;
         this.instanceActivityService = instanceActivityService;
         this.instanceSessionService = instanceSessionService;
         this.roleService = roleService;
         this.authenticator = authenticator;
+        System.out.println("Creating GuacamoleEndpoint");
     }
 
     @OnOpen
     public void onConnect(Session session) {
+        logger.info("Initialising websocket client with session id: {}", session.getId());
+
+        final Map<String, List<String>> data = session.getRequestParameterMap();
+        final String connectionId = data.get(CONNECTION_ID_PARAMETER).get(0);
         try {
-            logger.info("Initialising websocket client with session id: {}", session.getId());
 
             final InstanceAuthenticationToken token = authenticator.authenticate(session);
 
@@ -70,42 +76,26 @@ public class GuacamoleEndpoint {
             final Instance instance = token.getInstance();
             final Role role = roleService.getRole(instance, user);
 
-            if (instance.getUsername() == null) {
-                logger.warn("No username is associated with the instance {}: the owner has never connected. Disconnecting user {}", instance.getId(), user);
-                throw new OwnerNotConnectedException();
+            this.desktopConnectionService.startConnectionThread(connectionId, session, instance, user, role);
 
-            } else {
-                if (role.equals(SUPPORT)) {
-//                    // See if user can connect even if owner is away
-//                    if (this.instanceSessionService.canConnectWhileOwnerAway(instance, user)) {
-//                        this.desktopConnectionService.createDesktopConnection(session, instance, user, role);
-//
-//                    } else {
-//                        if (this.desktopConnectionService.isOwnerConnected(instance)) {
-//                            // Start process of requesting access from the owner
-//                            this.desktopAccessService.initiateAccess(client, user, instance);
-//
-//                        } else {
-//                            throw new OwnerNotConnectedException();
-//                        }
-//                    }
-
-                } else {
-                    this.desktopConnectionService.createDesktopConnection(session, instance, user, role);
-                }
-            }
+            this.sessionConnectionIds.put(session.getId(), connectionId);
 
         } catch (OwnerNotConnectedException exception) {
 //            session.getBasicRemote().sendText(OWNER_AWAY_EVENT);
+            logger.warn("OwnerNotConnected for connection {} so disconnecting", connectionId);
             this.closeConnection(session);
 
         } catch (UnauthorizedException exception) {
-            logger.warn(exception.getMessage());
+            logger.warn("Unauthorised connection for connection {} so disconnecting: {}", connectionId, exception.getMessage());
 //            client.sendEvent(ACCESS_DENIED);
             this.closeConnection(session);
 
-        } catch (InvalidTokenException | ConnectionException exception) {
-            logger.error(exception.getMessage());
+        } catch (InvalidTokenException exception) {
+            logger.warn("InvalidTokenException for connection {} so disconnecting: {}", connectionId, exception.getMessage());
+            this.closeConnection(session);
+
+        } catch (ConnectionException exception) {
+            logger.warn("ConnectionException for connection {} so disconnecting: {}", connectionId, exception.getMessage());
             this.closeConnection(session);
         }
     }
@@ -117,7 +107,8 @@ public class GuacamoleEndpoint {
 
     @OnMessage
     public void onMessage(Session session, String data) throws IOException {
-        final DesktopConnection connection = this.desktopConnectionService.getDesktopConnection(session.getId());
+        String connectionId = this.sessionConnectionIds.get(session.getId());
+        final DesktopConnection connection = this.desktopConnectionService.getDesktopConnection(connectionId);
         if (connection == null) {
             return;
         }
@@ -151,7 +142,7 @@ public class GuacamoleEndpoint {
 
                 instanceService.save(instance);
 
-                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberBySessionId(session.getId());
+                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(connectionId);
                 if (instanceSessionMember == null) {
                     logger.warn(format("Instance session member not found for instance %d", instanceId));
                 } else {
@@ -200,7 +191,6 @@ public class GuacamoleEndpoint {
 
     public static final class Configurator extends ServerEndpointConfig.Configurator {
         private final DesktopConnectionService desktopConnectionService;
-        private final DesktopAccessService desktopAccessService;
         private final InstanceService instanceService;
         private final InstanceActivityService instanceActivityService;
         private final InstanceSessionService instanceSessionService;
@@ -208,14 +198,12 @@ public class GuacamoleEndpoint {
         private final TokenAuthenticatorService authenticator;
 
         public Configurator(final DesktopConnectionService desktopConnectionService,
-                            final DesktopAccessService desktopAccessService,
                             final InstanceService instanceService,
                             final InstanceActivityService instanceActivityService,
                             final InstanceSessionService instanceSessionService,
                             final RoleService roleService,
                             final TokenAuthenticatorService authenticator) {
             this.desktopConnectionService = desktopConnectionService;
-            this.desktopAccessService = desktopAccessService;
             this.instanceService = instanceService;
             this.instanceActivityService = instanceActivityService;
             this.instanceSessionService = instanceSessionService;
@@ -224,7 +212,7 @@ public class GuacamoleEndpoint {
         }
 
         public <T> T getEndpointInstance(Class<T> clazz) throws InstantiationException {
-            return (T)new GuacamoleEndpoint(this.desktopConnectionService, this.desktopAccessService, this.instanceService, this.instanceActivityService, this.instanceSessionService, this.roleService, this.authenticator);
+            return (T)new GuacamoleEndpoint(this.desktopConnectionService, this.instanceService, this.instanceActivityService, this.instanceSessionService, this.roleService, this.authenticator);
         }
     }
 }

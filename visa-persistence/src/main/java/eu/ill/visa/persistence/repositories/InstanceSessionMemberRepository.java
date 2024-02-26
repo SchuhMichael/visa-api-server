@@ -54,12 +54,12 @@ public class InstanceSessionMemberRepository extends AbstractRepository<Instance
     }
 
 
-    public InstanceSessionMember getSessionMember(final InstanceSession instanceSession, final String sessionId) {
+    public InstanceSessionMember getSessionMember(final InstanceSession instanceSession, final String connectionId) {
         try {
             final TypedQuery<InstanceSessionMember> query = getEntityManager()
                 .createNamedQuery("instanceSessionMember.getByInstanceSessionAndSessionId", InstanceSessionMember.class);
             query.setParameter("instanceSession", instanceSession);
-            query.setParameter("sessionId", sessionId);
+            query.setParameter("sessionId", connectionId);
             return query.getSingleResult();
         } catch (NoResultException exception) {
             return null;
@@ -93,10 +93,10 @@ public class InstanceSessionMemberRepository extends AbstractRepository<Instance
         }
     }
 
-    public InstanceSessionMember getBySessionId(String sessionId) {
+    public InstanceSessionMember getByConnectionId(String connectionId) {
         try {
             final TypedQuery<InstanceSessionMember> query = getEntityManager().createNamedQuery("instanceSessionMember.getBySessionId", InstanceSessionMember.class);
-            query.setParameter("sessionId", sessionId);
+            query.setParameter("sessionId", connectionId);
             return query.getSingleResult();
         } catch (NoResultException exception) {
             return null;
