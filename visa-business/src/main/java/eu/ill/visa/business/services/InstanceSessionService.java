@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @Transactional
 @Singleton
@@ -62,14 +63,14 @@ public class InstanceSessionService {
         this.repository.save(instanceSession);
     }
 
-    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, String connectionId, User user, String role) {
+    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID connectionId, User user, String role) {
         InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, connectionId, user, role);
         sessionMember.setActive(true);
 
         this.instanceSessionMemberRepository.save(sessionMember);
     }
 
-    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, String connectionId) {
+    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID connectionId) {
         InstanceSessionMember sessionMember = this.instanceSessionMemberRepository.getSessionMember(instanceSession, connectionId);
         if (sessionMember != null) {
             sessionMember.setActive(false);
@@ -98,7 +99,7 @@ public class InstanceSessionService {
         return this.instanceSessionMemberRepository.getAllSessionMembers(instance);
     }
 
-    public InstanceSessionMember getSessionMemberByConnectionId(String connectionId) {
+    public InstanceSessionMember getSessionMemberByConnectionId(UUID connectionId) {
         return this.instanceSessionMemberRepository.getByConnectionId(connectionId);
     }
 

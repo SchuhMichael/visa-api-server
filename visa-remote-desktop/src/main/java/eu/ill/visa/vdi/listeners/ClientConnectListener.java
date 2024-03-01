@@ -11,12 +11,15 @@ import eu.ill.visa.vdi.exceptions.ConnectionException;
 import eu.ill.visa.vdi.exceptions.InvalidTokenException;
 import eu.ill.visa.vdi.exceptions.OwnerNotConnectedException;
 import eu.ill.visa.vdi.exceptions.UnauthorizedException;
+import eu.ill.visa.vdi.models.DesktopConnection;
 import eu.ill.visa.vdi.services.DesktopAccessService;
 import eu.ill.visa.vdi.services.DesktopConnectionService;
 import eu.ill.visa.vdi.services.RoleService;
 import eu.ill.visa.vdi.services.TokenAuthenticatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 import static eu.ill.visa.vdi.domain.Role.SUPPORT;
 import static eu.ill.visa.vdi.events.Event.*;
@@ -45,7 +48,7 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
     public void onConnect(final SocketIOClient client) {
         try {
             final InstanceAuthenticationToken token = authenticator.authenticate(client);
-            final String connectionId = token.getToken();
+            final UUID connectionId = token.getToken();
 
             logger.info("Initialising websocket client with session id: {} and connectionId {}", client.getSessionId(), connectionId);
 
@@ -62,7 +65,7 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
                     // See if user can connect even if owner is away
                     if (this.instanceSessionService.canConnectWhileOwnerAway(instance, user)) {
                         this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
-                        client.sendEvent(CONNECTED_EVENT);
+                        client.sendEvent(CONNECTED_EVENT, connectionId);
 
                     } else {
                         if (this.desktopConnectionService.isOwnerConnected(instance)) {
@@ -75,9 +78,9 @@ public class ClientConnectListener extends AbstractListener implements ConnectLi
                     }
 
                 } else {
-                    this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
-                    client.sendEvent(CONNECTED_EVENT);
-                    client.sendEvent(USER_CONNECTED_EVENT);
+                    DesktopConnection connection = this.desktopConnectionService.createDesktopConnection(connectionId, client, instance, user, role);
+                    client.sendEvent(CONNECTED_EVENT, connectionId);
+                    client.sendEvent(USER_CONNECTED_EVENT, connection.getConnectedUser());
                 }
             }
 

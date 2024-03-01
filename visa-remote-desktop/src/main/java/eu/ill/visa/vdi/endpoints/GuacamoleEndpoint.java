@@ -25,14 +25,11 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.String.format;
 
-@ServerEndpoint(value = "/socket", subprotocols = {"guacamole", "webx"})
+@ServerEndpoint(value = "/ws/vdi", subprotocols = {"guacamole", "webx"})
 public class GuacamoleEndpoint {
     private final static String CONNECTION_ID_PARAMETER = "connectionId";
 
@@ -45,7 +42,7 @@ public class GuacamoleEndpoint {
     private final RoleService roleService;
     private final TokenAuthenticatorService authenticator;
 
-    private Map<String, String> sessionConnectionIds = new HashMap<>();
+    private final Map<String, UUID> sessionConnectionIds = new HashMap<>();
 
     public GuacamoleEndpoint(final DesktopConnectionService desktopConnectionService,
                              final InstanceService instanceService,
@@ -67,7 +64,8 @@ public class GuacamoleEndpoint {
         logger.info("Initialising websocket client with session id: {}", session.getId());
 
         final Map<String, List<String>> data = session.getRequestParameterMap();
-        final String connectionId = data.get(CONNECTION_ID_PARAMETER).get(0);
+        final String connectionIdString = data.get(CONNECTION_ID_PARAMETER).get(0);
+        final UUID connectionId = UUID.fromString(connectionIdString);
         try {
 
             final InstanceAuthenticationToken token = authenticator.authenticate(session);
@@ -81,13 +79,11 @@ public class GuacamoleEndpoint {
             this.sessionConnectionIds.put(session.getId(), connectionId);
 
         } catch (OwnerNotConnectedException exception) {
-//            session.getBasicRemote().sendText(OWNER_AWAY_EVENT);
             logger.warn("OwnerNotConnected for connection {} so disconnecting", connectionId);
             this.closeConnection(session);
 
         } catch (UnauthorizedException exception) {
             logger.warn("Unauthorised connection for connection {} so disconnecting: {}", connectionId, exception.getMessage());
-//            client.sendEvent(ACCESS_DENIED);
             this.closeConnection(session);
 
         } catch (InvalidTokenException exception) {
@@ -101,13 +97,17 @@ public class GuacamoleEndpoint {
     }
 
     @OnClose
-    public void onDisconnect(CloseReason reason) {
-        System.out.println("on disconnect " + reason);
+    public void onDisconnect(Session session, CloseReason reason) {
+        logger.info("on disconnect of session {}: {}", session.getId(), reason);
+
+        UUID connectionId = this.sessionConnectionIds.get(session.getId());
+        final DesktopConnection connection = this.desktopConnectionService.getDesktopConnection(connectionId);
+
     }
 
     @OnMessage
     public void onMessage(Session session, String data) throws IOException {
-        String connectionId = this.sessionConnectionIds.get(session.getId());
+        UUID connectionId = this.sessionConnectionIds.get(session.getId());
         final DesktopConnection connection = this.desktopConnectionService.getDesktopConnection(connectionId);
         if (connection == null) {
             return;
@@ -160,6 +160,11 @@ public class GuacamoleEndpoint {
             }
         }
 
+    }
+
+    @OnError
+    public void onError(Session session, Throwable t) {
+        logger.error("Got websocket error for session {}: {}", session.getId(), t.getMessage());
     }
 
     private void closeConnection(Session session) {

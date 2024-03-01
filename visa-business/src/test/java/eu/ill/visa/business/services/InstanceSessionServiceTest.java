@@ -74,7 +74,7 @@ public class InstanceSessionServiceTest {
         instanceSessionService.save(session);
         InstanceSession persistedInstanceSession = instanceSessionService.getById(session.getId());
         assertNotNull(persistedInstanceSession);
-        assertEquals("a-connection-id", persistedInstanceSession.getConnectionId());
+        assertEquals("a-connection-id", persistedInstanceSession.getRemoteDesktopConnectionId());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class InstanceSessionServiceTest {
 
         InstanceSession instanceSession = instanceSessionService.getById(1000L);
         List<InstanceSessionMember> members1 = instanceSessionService.getAllSessionMembers(instanceSession);
-        instanceSessionService.addInstanceSessionMember(instanceSession, sessionId.toString(), user, "OWNER");
+        instanceSessionService.addInstanceSessionMember(instanceSession, sessionId, user, "OWNER");
         List<InstanceSessionMember> members2 = instanceSessionService.getAllSessionMembers(instanceSession);
         assertEquals(members1.size() + 1, members2.size());
     }
@@ -114,7 +114,7 @@ public class InstanceSessionServiceTest {
         List<InstanceSessionMember> members1 = instanceSessionService.getAllSessionMembers(persistedInstanceSession);
         assertEquals(0, members1.size());
 
-        instanceSessionService.addInstanceSessionMember(persistedInstanceSession, sessionId.toString(), user, "OWNER");
+        instanceSessionService.addInstanceSessionMember(persistedInstanceSession, sessionId, user, "OWNER");
         List<InstanceSessionMember> members2 = instanceSessionService.getAllSessionMembers(persistedInstanceSession);
         assertEquals(1, members2.size());
         instanceSessionService.removeInstanceSessionMember(persistedInstanceSession, sessionId);

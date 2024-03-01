@@ -7,16 +7,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class InstanceSession extends Timestampable {
 
     private Long id;
-    private String connectionId;
+    private String remoteDesktopConnectionId;
     private Instance instance;
     private Boolean current;
 
     public InstanceSession() {
     }
 
-    public InstanceSession(Instance instance, String connectionId) {
+    public InstanceSession(Instance instance, String remoteDesktopConnectionId) {
         this.instance = instance;
-        this.connectionId = connectionId;
+        this.remoteDesktopConnectionId = remoteDesktopConnectionId;
         this.current = true;
     }
 
@@ -36,12 +36,12 @@ public class InstanceSession extends Timestampable {
         this.instance = instance;
     }
 
-    public String getConnectionId() {
-        return connectionId;
+    public String getRemoteDesktopConnectionId() {
+        return remoteDesktopConnectionId;
     }
 
-    public void setConnectionId(String connectionId) {
-        this.connectionId = connectionId;
+    public void setRemoteDesktopConnectionId(String remoteDesktopConnectionId) {
+        this.remoteDesktopConnectionId = remoteDesktopConnectionId;
     }
 
     public Boolean getCurrent() {
@@ -76,7 +76,7 @@ public class InstanceSession extends Timestampable {
     public String toString() {
         return new ToStringBuilder(this)
             .append("id", id)
-            .append("connectionId", connectionId)
+            .append("connectionId", remoteDesktopConnectionId)
             .append("current", current)
             .toString();
     }

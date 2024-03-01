@@ -61,7 +61,7 @@ public class DesktopConnectionService {
     }
 
     public void broadcast(final SocketIOClient client, final Event ...events) {
-        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
+        final DesktopConnection connection = this.getDesktopConnectionByClient(client);
         this.broadcast(client, connection.getRoomId(), events);
     }
 
@@ -76,7 +76,7 @@ public class DesktopConnectionService {
 //        }
     }
 
-    public DesktopConnection createDesktopConnection(final String connectionId, final SocketIOClient client, final Instance instance, final User user, final Role role) throws OwnerNotConnectedException, UnauthorizedException, ConnectionException {
+    public DesktopConnection createDesktopConnection(final UUID connectionId, final SocketIOClient client, final Instance instance, final User user, final Role role) throws OwnerNotConnectedException, UnauthorizedException, ConnectionException {
         if (role == Role.NONE) {
             throw new UnauthorizedException("User " + user.getFullName() + " is unauthorised to access the instance " + instance.getId());
         }
@@ -90,7 +90,7 @@ public class DesktopConnectionService {
         return desktopConnection;
     }
 
-    public void startConnectionThread(final String connectionId, final Session session, final Instance instance, final User user, final Role role) throws OwnerNotConnectedException, UnauthorizedException, ConnectionException {
+    public void startConnectionThread(final UUID connectionId, final Session session, final Instance instance, final User user, final Role role) throws OwnerNotConnectedException, UnauthorizedException, ConnectionException {
         DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         if (desktopConnection == null) {
             throw new UnauthorizedException("DesktopConnection has not been initialised with Id " + connectionId);
@@ -117,7 +117,6 @@ public class DesktopConnectionService {
 
         desktopConnection.setConnectionThread(connectionThread);
 
-
         InstanceSession instanceSession = this.instanceSessionService.getByInstance(instance);
         boolean unlockRoom = virtualDesktopConfiguration.getOwnerDisconnectionPolicy().equals(VirtualDesktopConfiguration.OWNER_DISCONNECTION_POLICY_LOCK_ROOM)
             && role.equals(Role.OWNER)
@@ -142,9 +141,9 @@ public class DesktopConnectionService {
 
     }
 
-    public DesktopConnection getDesktopConnection(final String connectionId) {
+    public DesktopConnection getDesktopConnection(final UUID connectionId) {
         return this.desktopConnections.stream()
-            .filter(desktopConnection -> desktopConnection.getConnectionId().equals(connectionId))
+            .filter(desktopConnection -> desktopConnection.getId().equals(connectionId))
             .findFirst()
             .orElse(null);
     }
@@ -156,14 +155,14 @@ public class DesktopConnectionService {
             .orElse(null);
     }
 
-    public void removeDesktopConnection(final String connectionId) {
+    public void removeDesktopConnection(final UUID connectionId) {
         DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         if (desktopConnection != null) {
             this.desktopConnections.remove(desktopConnection);
         }
     }
 
-    public ConnectedUser getConnectedUser(final String connectionId) {
+    public ConnectedUser getConnectedUser(final UUID connectionId) {
         final DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         return desktopConnection.getConnectedUser();
     }
@@ -195,7 +194,7 @@ public class DesktopConnectionService {
         return false;
     }
 
-    public void disconnectAllRoomClients(final String connectionId, final String room) {
+    public void disconnectAllRoomClients(final UUID connectionId, final String room) {
         DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         if (desktopConnection != null) {
             SocketIOClient client = desktopConnection.getClient();
@@ -213,7 +212,7 @@ public class DesktopConnectionService {
         }
     }
 
-    public void lockRoom(final String connectionId, final String room, Instance instance) {
+    public void lockRoom(final UUID connectionId, final String room, Instance instance) {
         DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         if (desktopConnection != null) {
             SocketIOClient client = desktopConnection.getClient();
@@ -238,7 +237,7 @@ public class DesktopConnectionService {
         }
     }
 
-    public void unlockRoom(final String connectionId, final String room, Instance instance) {
+    public void unlockRoom(final UUID connectionId, final String room, Instance instance) {
         DesktopConnection desktopConnection = this.getDesktopConnection(connectionId);
         if (desktopConnection != null) {
             SocketIOClient client = desktopConnection.getClient();
@@ -260,21 +259,24 @@ public class DesktopConnectionService {
         }
     }
 
-    public boolean disconnectClient(SocketIOClient owner, String room, UUID clientSessionId) {
+    public boolean disconnectClient(SocketIOClient owner, String room, UUID connectionId) {
         final SocketIONamespace namespace = owner.getNamespace();
 
         final BroadcastOperations operations = namespace.getRoomOperations(room);
         final Collection<SocketIOClient> clients = operations.getClients();
 
-        Optional<SocketIOClient> clientOptional = clients.stream()
-            .filter(aClient -> aClient.getSessionId().equals(clientSessionId))
-            .findFirst();
+        SocketIOClient client = clients.stream()
+            .filter(aClient -> {
+                DesktopConnection desktopConnection = this.getDesktopConnectionByClient(aClient);
+                return desktopConnection.getId().equals(connectionId);
+            })
+            .findFirst()
+            .orElse(null);
 
-        if (clientOptional.isPresent()) {
-            logger.info("Disconnecting client {} from room {}", clientSessionId, room);
-            SocketIOClient aClient = clientOptional.get();
-            aClient.sendEvent(ACCESS_REVOKED_EVENT);
-            aClient.disconnect();
+        if (client != null) {
+            logger.info("Disconnecting client connection {} from room {}", connectionId, room);
+            client.sendEvent(ACCESS_REVOKED_EVENT);
+            client.disconnect();
 
             return true;
 

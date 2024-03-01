@@ -7,7 +7,6 @@ public class InstanceSessionMemberDto {
     private Long id;
     private Date createdAt;
     private InstanceSessionDto instanceSession;
-    private String sessionId;
     private UserSimpleDto user;
     private String role;
     private boolean active;
@@ -39,14 +38,6 @@ public class InstanceSessionMemberDto {
 
     public void setInstanceSession(InstanceSessionDto instanceSession) {
         this.instanceSession = instanceSession;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
     }
 
     public UserSimpleDto getUser() {

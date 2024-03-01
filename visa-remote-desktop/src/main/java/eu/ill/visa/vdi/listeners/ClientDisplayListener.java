@@ -41,7 +41,7 @@ public abstract class ClientDisplayListener<T> extends AbstractListener implemen
     @Override
     public void onData(final SocketIOClient client, final T data, final AckRequest ackRequest) {
 
-        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
+        final DesktopConnection connection = this.getDesktopConnectionByClient(client);
         if (connection == null) {
             return;
         }
@@ -74,7 +74,7 @@ public abstract class ClientDisplayListener<T> extends AbstractListener implemen
 
                 instanceService.save(instance);
 
-                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(client.getSessionId().toString());
+                final InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(connection.getId());
                 if (instanceSessionMember == null) {
                     logger.warn(format("Instance session member not found for instance %d", instanceId));
                 } else {

@@ -12,6 +12,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Objects.requireNonNullElseGet;
 
@@ -54,12 +55,12 @@ public class InstanceSessionMemberRepository extends AbstractRepository<Instance
     }
 
 
-    public InstanceSessionMember getSessionMember(final InstanceSession instanceSession, final String connectionId) {
+    public InstanceSessionMember getSessionMember(final InstanceSession instanceSession, final UUID connectionId) {
         try {
             final TypedQuery<InstanceSessionMember> query = getEntityManager()
                 .createNamedQuery("instanceSessionMember.getByInstanceSessionAndSessionId", InstanceSessionMember.class);
             query.setParameter("instanceSession", instanceSession);
-            query.setParameter("sessionId", connectionId);
+            query.setParameter("connectionId", connectionId);
             return query.getSingleResult();
         } catch (NoResultException exception) {
             return null;
@@ -93,10 +94,10 @@ public class InstanceSessionMemberRepository extends AbstractRepository<Instance
         }
     }
 
-    public InstanceSessionMember getByConnectionId(String connectionId) {
+    public InstanceSessionMember getByConnectionId(UUID connectionId) {
         try {
             final TypedQuery<InstanceSessionMember> query = getEntityManager().createNamedQuery("instanceSessionMember.getBySessionId", InstanceSessionMember.class);
-            query.setParameter("sessionId", connectionId);
+            query.setParameter("connectionId", connectionId);
             return query.getSingleResult();
         } catch (NoResultException exception) {
             return null;

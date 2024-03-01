@@ -36,7 +36,7 @@ public class ClientAccessRevokedCommandListener extends AbstractListener impleme
 
     @Override
     public void onData(final SocketIOClient client, final AccessRevokedCommand command, final AckRequest ackRequest) {
-        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
+        final DesktopConnection connection = this.getDesktopConnectionByClient(client);
 
         if (connection != null) {
             if (connection.getConnectedUser().getRole().equals(Role.OWNER)) {
@@ -54,7 +54,7 @@ public class ClientAccessRevokedCommandListener extends AbstractListener impleme
 
                     // Disconnect all associated sessions
                     membersToRevoke.forEach(instanceSessionMember -> {
-                        UUID revokedSessionId = UUID.fromString(instanceSessionMember.getSessionId());
+                        UUID revokedSessionId = instanceSessionMember.getConnectionId();
                         if (!this.desktopConnectionService.disconnectClient(client, connection.getRoomId(), revokedSessionId)) {
                             // Broadcast event to all servers if client not found locally
                             this.broadcast(client, new AccessRevokedEvent(connection.getRoomId(), revokedSessionId));

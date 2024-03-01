@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class InstanceAuthenticationTokenRepository extends AbstractRepository<InstanceAuthenticationToken> {
@@ -24,7 +25,7 @@ public class InstanceAuthenticationTokenRepository extends AbstractRepository<In
         return query.getResultList();
     }
 
-    public InstanceAuthenticationToken getByToken(final String token) {
+    public InstanceAuthenticationToken getByToken(final UUID token) {
         try {
             final TypedQuery<InstanceAuthenticationToken> query = getEntityManager().createNamedQuery("instanceAuthenticationToken.getByToken", InstanceAuthenticationToken.class);
             query.setParameter("token", token);

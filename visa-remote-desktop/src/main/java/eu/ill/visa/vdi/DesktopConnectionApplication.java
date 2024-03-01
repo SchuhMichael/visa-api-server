@@ -1,6 +1,7 @@
 package eu.ill.visa.vdi;
 
 import com.corundumstudio.socketio.Configuration;
+import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.store.RedissonStoreFactory;
 import com.corundumstudio.socketio.store.StoreFactory;
@@ -38,6 +39,8 @@ public class DesktopConnectionApplication {
     private final DesktopAccessService desktopAccessService;
     private final VirtualDesktopConfiguration virtualDesktopConfiguration;
 
+    private final SocketIONamespace namespace;
+
     @Inject
     public DesktopConnectionApplication(final SocketIOServer server,
                                         final InstanceSessionService instanceSessionService,
@@ -59,6 +62,9 @@ public class DesktopConnectionApplication {
         this.desktopAccessService = desktopAccessService;
         this.virtualDesktopConfiguration = virtualDesktopConfiguration;
         this.instanceActivityService = instanceActivityService;
+
+        this.namespace = server.addNamespace("/desktop-connection");
+
     }
 
     public void startServer() {
@@ -78,11 +84,11 @@ public class DesktopConnectionApplication {
     }
 
     private void bindListeners(final SocketIOServer server) {
-        server.addConnectListener(new ClientConnectListener(this.desktopConnectionService, this.desktopAccessService, this.instanceSessionService, this.roleService, this.authenticator));
-        server.addEventListener("thumbnail", byte[].class, new ClientThumbnailListener(this.desktopConnectionService, this.instanceService));
-        server.addEventListener(Event.ACCESS_REPLY_EVENT, AccessReply.class, new ClientAccessReplyListener(this.desktopAccessService));
-        server.addEventListener(Event.ACCESS_REVOKED_EVENT, AccessRevokedCommand.class, new ClientAccessRevokedCommandListener(this.desktopConnectionService, this.instanceSessionService, this.instanceService));
-        server.addDisconnectListener(new ClientDisconnectListener(this.desktopConnectionService, this.desktopAccessService, this.instanceSessionService, this.instanceService, this.virtualDesktopConfiguration));
+        this.namespace.addConnectListener(new ClientConnectListener(this.desktopConnectionService, this.desktopAccessService, this.instanceSessionService, this.roleService, this.authenticator));
+        this.namespace.addEventListener("thumbnail", byte[].class, new ClientThumbnailListener(this.desktopConnectionService, this.instanceService));
+        this.namespace.addEventListener(Event.ACCESS_REPLY_EVENT, AccessReply.class, new ClientAccessReplyListener(this.desktopAccessService));
+        this.namespace.addEventListener(Event.ACCESS_REVOKED_EVENT, AccessRevokedCommand.class, new ClientAccessRevokedCommandListener(this.desktopConnectionService, this.instanceSessionService, this.instanceService));
+        this.namespace.addDisconnectListener(new ClientDisconnectListener(this.desktopConnectionService, this.desktopAccessService, this.instanceSessionService, this.instanceService, this.virtualDesktopConfiguration));
     }
 
     private void bindStoreFactorySubscriptions() {

@@ -1,12 +1,13 @@
 package eu.ill.visa.core.domain;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class InstanceSessionMember extends Timestampable {
 
     private Long id;
     private InstanceSession instanceSession;
-    private String sessionId;
+    private UUID connectionId;
     private User user;
     private String role;
     private boolean active = false;
@@ -17,9 +18,9 @@ public class InstanceSessionMember extends Timestampable {
     public InstanceSessionMember() {
     }
 
-    public InstanceSessionMember(InstanceSession instanceSession, String sessionId, User user, String role) {
+    public InstanceSessionMember(InstanceSession instanceSession, UUID connectionId, User user, String role) {
         this.instanceSession = instanceSession;
-        this.sessionId = sessionId;
+        this.connectionId = connectionId;
         this.user = user;
         this.role = role;
     }
@@ -40,12 +41,12 @@ public class InstanceSessionMember extends Timestampable {
         this.instanceSession = instanceSession;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public UUID getConnectionId() {
+        return connectionId;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setConnectionId(UUID connectionId) {
+        this.connectionId = connectionId;
     }
 
     public User getUser() {

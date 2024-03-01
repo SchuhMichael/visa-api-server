@@ -16,7 +16,7 @@
         <query>
             SELECT i FROM InstanceSessionMember i
             WHERE i.instanceSession = :instanceSession
-            AND i.sessionId = :sessionId
+            AND i.connectionId = :connectionId
             AND i.active = true
         </query>
     </named-query>
@@ -50,7 +50,7 @@
     <named-query name="instanceSessionMember.getBySessionId">
         <query>
             SELECT i FROM InstanceSessionMember i
-            WHERE i.sessionId = :sessionId
+            WHERE i.connectionId = :connectionId
             AND i.active = true
         </query>
     </named-query>
@@ -62,8 +62,8 @@
                 <column name="id" nullable="false"/>
                 <generated-value strategy="IDENTITY" />
             </id>
-            <basic name="sessionId">
-                <column name="session_id" nullable="false" length="150"/>
+            <basic name="connectionId">
+                <column name="session_id" nullable="false" length="150" column-definition="VARCHAR(250)"/>
             </basic>
             <basic name="role">
                 <column name="role" nullable="false" length="150"/>

@@ -291,7 +291,6 @@ type Message {
 
 type InstanceSession {
     id: Int!
-    connectionId : String!
     instance: Instance!
     current: Boolean!
 }
@@ -302,7 +301,6 @@ type InstanceSessionMember {
     updatedAt: Date
     lastInteractionAt: Date
     instanceSession: InstanceSession!
-    sessionId: String!
     user: User!
     role: String
     active: Boolean

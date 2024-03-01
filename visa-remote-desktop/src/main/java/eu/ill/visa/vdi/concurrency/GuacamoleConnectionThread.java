@@ -23,7 +23,7 @@ public class GuacamoleConnectionThread extends ConnectionThread {
     private final SocketIOClient client;
 
     public GuacamoleConnectionThread(final SocketIOClient client, final GuacamoleTunnel tunnel, final Instance instance, final User user, final Role role) {
-        super(client.getSessionId().toString(), instance, user, role);
+        super(instance, user, role);
         this.tunnel = tunnel;
         this.client = client;
     }

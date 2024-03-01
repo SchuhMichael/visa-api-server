@@ -2,10 +2,12 @@ package eu.ill.visa.core.domain;
 
 import org.joda.time.DateTime;
 
+import java.util.UUID;
+
 public class InstanceAuthenticationToken extends Timestampable {
-    private Long     id;
-    private String   token;
-    private User     user;
+    private Long id;
+    private UUID token;
+    private User user;
     private Instance instance;
 
     public InstanceAuthenticationToken() {
@@ -31,11 +33,11 @@ public class InstanceAuthenticationToken extends Timestampable {
         this.id = id;
     }
 
-    public String getToken() {
+    public UUID getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(UUID token) {
         this.token = token;
     }
 
@@ -62,7 +64,7 @@ public class InstanceAuthenticationToken extends Timestampable {
 
     public static final class Builder {
         private Long   id;
-        private String token;
+        private UUID token;
         private User   user;
         private Instance instance;
         private Builder() {
@@ -77,7 +79,7 @@ public class InstanceAuthenticationToken extends Timestampable {
             return this;
         }
 
-        public Builder token(String token) {
+        public Builder token(UUID token) {
             this.token = token;
             return this;
         }

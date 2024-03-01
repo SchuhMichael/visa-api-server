@@ -25,7 +25,7 @@
                 <generated-value strategy="IDENTITY"/>
             </id>
             <basic name="token">
-                <column name="token" length="250" nullable="false"/>
+                <column name="token" length="250" nullable="false" column-definition="VARCHAR(250)"/>
             </basic>
             <many-to-one name="user" optional="false">
                 <join-column name="user_id" nullable="false"/>

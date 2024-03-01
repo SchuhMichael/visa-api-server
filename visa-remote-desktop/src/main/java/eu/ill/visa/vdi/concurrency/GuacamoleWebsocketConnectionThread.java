@@ -25,7 +25,7 @@ public class GuacamoleWebsocketConnectionThread extends ConnectionThread {
     private final Session session;
 
     public GuacamoleWebsocketConnectionThread(final Session session, final GuacamoleTunnel tunnel, final Instance instance, final User user, final Role role) {
-        super(session.getId(), instance, user, role);
+        super(instance, user, role);
         this.tunnel = tunnel;
         this.session = session;
     }

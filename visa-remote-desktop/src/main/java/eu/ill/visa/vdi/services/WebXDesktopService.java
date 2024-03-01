@@ -103,7 +103,7 @@ public class WebXDesktopService extends DesktopService {
         if (role.equals(OWNER) || instanceSessionService.canConnectWhileOwnerAway(instance, user)) {
             final WebXTunnel tunnel = buildTunnel(instance);
             InstanceSession session = instanceSessionService.create(instance, tunnel.getConnectionId());
-            logger.info("User {} created WebX session {}", getInstanceAndUser(instance, user, role), session.getConnectionId());
+            logger.info("User {} created WebX session {}", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
 
             return tunnel;
 
@@ -122,11 +122,11 @@ public class WebXDesktopService extends DesktopService {
         } else {
             try {
                 // try to connect to existing sessionId
-                logger.info("User {} connecting to existing WebX session {}", getInstanceAndUser(instance, user, role), session.getConnectionId());
+                logger.info("User {} connecting to existing WebX session {}", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
                 return buildTunnel(instance, session);
 
             } catch (WebXConnectionException exception) {
-                logger.error("Failed to connect {} to given WebX session {} so creating a new one", getInstanceAndUser(instance, user, role), session.getConnectionId());
+                logger.error("Failed to connect {} to given WebX session {} so creating a new one", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
                 // If it fails then invalidate current session
                 session.setCurrent(false);
                 this.instanceSessionService.save(session);

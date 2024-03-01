@@ -26,14 +26,14 @@ public class InstanceAuthenticationTokenService {
         return this.repository.getAll();
     }
 
-    public InstanceAuthenticationToken getByToken(String token) {
+    public InstanceAuthenticationToken getByToken(UUID token) {
         return this.repository.getByToken(token);
     }
 
     public InstanceAuthenticationToken create(User user, Instance instance) {
 
         InstanceAuthenticationToken instanceAuthenticationToken = InstanceAuthenticationToken.newBuilder()
-            .token(UUID.randomUUID().toString())
+            .token(UUID.randomUUID())
             .user(user)
             .instance(instance)
             .build();

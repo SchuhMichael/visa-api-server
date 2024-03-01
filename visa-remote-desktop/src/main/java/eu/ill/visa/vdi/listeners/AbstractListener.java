@@ -8,6 +8,7 @@ import eu.ill.visa.vdi.models.DesktopConnection;
 import eu.ill.visa.vdi.services.DesktopConnectionService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AbstractListener {
 
@@ -21,16 +22,16 @@ public class AbstractListener {
         this.desktopConnectionService.broadcast(client, events);
     }
 
-    public DesktopConnection getDesktopConnection(final String clientId) {
-        return this.desktopConnectionService.getDesktopConnection(clientId);
+    public DesktopConnection getDesktopConnectionByClient(final SocketIOClient client) {
+        return this.desktopConnectionService.getDesktopConnectionByClient(client);
     }
 
-    public void removeDesktopConnection(final String clientId) {
-        this.desktopConnectionService.removeDesktopConnection(clientId);
+    public void removeDesktopConnection(final UUID connectionId) {
+        this.desktopConnectionService.removeDesktopConnection(connectionId);
     }
 
-    public ConnectedUser getConnectedUser(final String clientId) {
-        return this.desktopConnectionService.getConnectedUser(clientId);
+    public ConnectedUser getConnectedUser(final UUID connectionId) {
+        return this.desktopConnectionService.getConnectedUser(connectionId);
     }
 
     public List<ConnectedUser> getConnectedUsers(Instance instance, boolean isRoomLocked) {

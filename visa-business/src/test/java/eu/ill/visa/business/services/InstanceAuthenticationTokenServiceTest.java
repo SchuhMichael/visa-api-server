@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,7 +28,7 @@ public class InstanceAuthenticationTokenServiceTest {
     @Test
     @DisplayName("Get a instance by a known token")
     void testGetByToken() {
-        String token = "24e7437a-eae5-48c4-923e-778c42a6acf8";
+        UUID token = UUID.fromString("24e7437a-eae5-48c4-923e-778c42a6acf8");
         InstanceAuthenticationToken instanceAuthenticationToken = this.instanceAuthenticationTokenService.getByToken(token);
         assertNotNull(instanceAuthenticationToken);
         assertEquals(1000L, instanceAuthenticationToken.getId());

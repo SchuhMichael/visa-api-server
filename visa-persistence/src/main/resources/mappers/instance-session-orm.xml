@@ -29,7 +29,7 @@
                 <column name="id" nullable="false"/>
                 <generated-value strategy="IDENTITY"/>
             </id>
-            <basic name="connectionId">
+            <basic name="remoteDesktopConnectionId">
                 <column name="connection_id" nullable="false" length="150"/>
             </basic>
             <basic name="createdAt">

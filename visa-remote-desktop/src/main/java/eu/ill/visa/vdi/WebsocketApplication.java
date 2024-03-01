@@ -59,7 +59,7 @@ public class WebsocketApplication {
 
                         // Add WebSocket endpoint to javax.websocket layer
                         wsContainer.addEndpoint(ServerEndpointConfig.Builder
-                                .create(GuacamoleEndpoint.class, "/socket")
+                                .create(GuacamoleEndpoint.class, "/ws/vdi")
                                 .configurator(new GuacamoleEndpoint.Configurator(this.desktopConnectionService, this.instanceService, this.instanceActivityService, this.instanceSessionService, this.roleService, this.authenticator))
                                 .build());
                     });

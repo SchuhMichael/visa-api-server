@@ -22,10 +22,14 @@ import eu.ill.visa.vdi.exceptions.ConnectionException;
 import eu.ill.visa.vdi.exceptions.OwnerNotConnectedException;
 import eu.ill.visa.vdi.exceptions.UnauthorizedException;
 import eu.ill.visa.vdi.models.DesktopCandidate;
+import eu.ill.visa.vdi.models.DesktopConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static eu.ill.visa.vdi.events.Event.ACCESS_DENIED;
 
@@ -48,14 +52,14 @@ public class DesktopAccessService {
         this.instanceService = instanceService;
     }
 
-    private DesktopCandidate addCandidate(String connectionId, SocketIOClient client, User user, Instance instance) {
+    private DesktopCandidate addCandidate(UUID connectionId, SocketIOClient client, User user, Instance instance) {
         DesktopCandidate desktopCandidate = new DesktopCandidate(connectionId, client, user, instance.getId());
         this.desktopCandidates.put(client.getSessionId(), desktopCandidate);
 
         return desktopCandidate;
     }
 
-    public void initiateAccess(String connectionId, SocketIOClient client, User user, Instance instance) {
+    public void initiateAccess(UUID connectionId, SocketIOClient client, User user, Instance instance) {
         // Create pending desktop connection
         DesktopCandidate desktopCandidate = this.addCandidate(connectionId, client, user, instance);
 
@@ -127,7 +131,8 @@ public class DesktopAccessService {
     private SocketIOClient getDesktopOwner(Collection<SocketIOClient> clients) {
 
         for (final SocketIOClient aClient : clients) {
-            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(aClient.getSessionId().toString());
+            DesktopConnection desktopConnection = this.desktopConnectionService.getDesktopConnectionByClient(aClient);
+            InstanceSessionMember instanceSessionMember = this.instanceSessionService.getSessionMemberByConnectionId(desktopConnection.getId());
             if (instanceSessionMember != null && instanceSessionMember.getRole().equals("OWNER")) {
                 return aClient;
             }
@@ -175,6 +180,7 @@ public class DesktopAccessService {
 
         } else {
             // Broadcast candidate response
+            // TODO Ignore ?
             this.desktopConnectionService.broadcast(owner, new AccessReplyEvent(new AccessReply(clientSessionId.toString(), replyRole.toString())));
         }
     }
@@ -215,7 +221,7 @@ public class DesktopAccessService {
 
     private void connectFromAccessReply(DesktopCandidate candidate, Role replyRole) {
 
-        String connectionId = candidate.getConnectionId();
+        UUID connectionId = candidate.getConnectionId();
         SocketIOClient client = candidate.getClient();
         if (client.isChannelOpen()) {
 

@@ -5,7 +5,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 
 public abstract class Event {
 
-    public static final String CONNECTED_EVENT = "connecticles";
+    public static final String CONNECTED_EVENT = "connected";
 
     public static final String USER_CONNECTED_EVENT = "user:connected";
     public static final String USER_DISCONNECTED_EVENT = "user:disconnected";

@@ -3,21 +3,23 @@ package eu.ill.visa.vdi.models;
 import com.corundumstudio.socketio.SocketIOClient;
 import eu.ill.visa.core.domain.User;
 
+import java.util.UUID;
+
 public class DesktopCandidate {
 
-    private final String connectionId;
+    private final UUID connectionId;
     private final SocketIOClient client;
     private final User user;
     private final Long instanceId;
 
-    public DesktopCandidate(String connectionId, SocketIOClient client, User user, Long instanceId) {
+    public DesktopCandidate(UUID connectionId, SocketIOClient client, User user, Long instanceId) {
         this.connectionId = connectionId;
         this.client = client;
         this.user = user;
         this.instanceId = instanceId;
     }
 
-    public String getConnectionId() {
+    public UUID getConnectionId() {
         return connectionId;
     }
 

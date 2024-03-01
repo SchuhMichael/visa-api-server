@@ -32,7 +32,7 @@ public class ClientThumbnailListener extends AbstractListener implements DataLis
 
     @Override
     public void onData(final SocketIOClient client, final byte[] data, final AckRequest ackRequest) {
-        final DesktopConnection connection = this.getDesktopConnection(client.getSessionId().toString());
+        final DesktopConnection connection = this.getDesktopConnectionByClient(client);
         try {
             if (connection == null) {
                 return;

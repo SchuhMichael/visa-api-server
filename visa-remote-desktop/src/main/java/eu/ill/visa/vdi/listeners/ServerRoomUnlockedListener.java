@@ -35,7 +35,7 @@ public class ServerRoomUnlockedListener implements PubSubListener<DispatchMessag
             final Collection<SocketIOClient> clients = operations.getClients();
 
             for (final SocketIOClient aClient : clients) {
-                DesktopConnection connection = this.desktopConnectionService.getDesktopConnection(aClient.getSessionId().toString());
+                DesktopConnection connection = this.desktopConnectionService.getDesktopConnectionByClient(aClient);
                 connection.setRoomLocked(false);
             }
         }

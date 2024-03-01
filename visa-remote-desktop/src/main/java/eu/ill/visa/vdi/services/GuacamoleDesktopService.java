@@ -88,7 +88,7 @@ public class GuacamoleDesktopService extends DesktopService {
             final Map<String, String> guacamoleParameters = configuration.getGuacdConfiguration();
             guacamoleParameters.forEach(config::setParameter);
         } else {
-            config.setConnectionID(session.getConnectionId());
+            config.setConnectionID(session.getRemoteDesktopConnectionId());
         }
         return config;
     }
@@ -116,7 +116,7 @@ public class GuacamoleDesktopService extends DesktopService {
         if (role.equals(OWNER) || instanceSessionService.canConnectWhileOwnerAway(instance, user)) {
             final ConfiguredGuacamoleSocket socket = buildSocket(instance);
             InstanceSession session = instanceSessionService.create(instance, socket.getConnectionID());
-            logger.info("User {} created guacamole session {}", getInstanceAndUser(instance, user, role), session.getConnectionId());
+            logger.info("User {} created guacamole session {}", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
 
             return socket;
 
@@ -135,11 +135,11 @@ public class GuacamoleDesktopService extends DesktopService {
         } else {
             try {
                 // try to connect to existing sessionId
-                logger.info("User {} connecting to existing guacamole session {}", getInstanceAndUser(instance, user, role), session.getConnectionId());
+                logger.info("User {} connecting to existing guacamole session {}", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
                 return buildSocket(instance, session);
 
             } catch (GuacamoleException exception) {
-                logger.error("Failed to connect {} to given guacamole session {} so creating a new one", getInstanceAndUser(instance, user, role), session.getConnectionId());
+                logger.error("Failed to connect {} to given guacamole session {} so creating a new one", getInstanceAndUser(instance, user, role), session.getRemoteDesktopConnectionId());
                 // If it fails then invalidate current session
                 session.setCurrent(false);
                 this.instanceSessionService.save(session);
