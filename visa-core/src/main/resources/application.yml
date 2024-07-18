@@ -153,7 +153,7 @@ graphql:
       username: ${VISA_DATABASE_USERNAME}
       password: ${VISA_DATABASE_PASSWORD}
       jdbc:
-        url: ${VISA_DATABASE_URL}
+        url: ${VISA_DATABASE_URL_FULL}/${VISA_DATABASE_USERNAME}
       db-kind: postgresql
 
 "%dev":
