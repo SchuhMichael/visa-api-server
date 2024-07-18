@@ -155,6 +155,7 @@ graphql:
       jdbc:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
+      db-name: ${VISA_DATABASE_USERNAME}
 
 "%dev":
   quarkus:
@@ -164,6 +165,7 @@ graphql:
       jdbc:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
+      db-name: ${VISA_DATABASE_USERNAME}
 
 "%test":
   quarkus:
@@ -186,13 +188,8 @@ graphql:
         generation: create
       sql-load-script: fixtures.sql
     datasource:
-#      devservices:
-#        enabled: true
-      username: ${VISA_DATABASE_USERNAME}
-      password: ${VISA_DATABASE_PASSWORD}
-      jdbc:
-        url: ${VISA_DATABASE_URL_FULL}
-      db-kind: postgresql
+      devservices:
+        enabled: true
     mailer:
       mock: true
       host: mailer.com
