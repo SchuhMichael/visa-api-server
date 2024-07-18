@@ -42,22 +42,6 @@ quarkus:
     console:
       enable: true
       filter: # error-email-filter
-    file:
-      enable: ${VISA_LOGGING_FILE_ENABLED:false}
-      path: ${VISA_LOGGING_FILE_DIRECTORY:/tmp}/application.log
-      format: ${VISA_LOGGING_FILE_FORMAT}
-      level: ${VISA_LOGGING_FILE_THRESHOLD:INFO}
-      rotation:
-        max-file-size: ${VISA_LOGGING_FILE_MAX_FILE_SIZE:100M}
-        max-backup-index: ${VISA_LOGGING_FILE_ARCHIVED_FILE_COUNT:0}
-    syslog:
-      enable: ${VISA_LOGGING_SYSLOG_ENABLED:false}
-      syslog-type: ${VISA_LOGGING_SYSLOG_TYPE:rfc3164}
-      endpoint: ${VISA_LOGGING_SYSLOG_ENDPOINT:logsrv.ill.fr:514}
-      format: ${VISA_LOGGING_SYSLOG_FORMAT}
-      app-name: ${VISA_LOGGING_SYSLOG_APP_NAME}
-      facility: ${VISA_LOGGING_SYSLOG_FACILITY:local-use-0}
-      truncate: false
     category:
       "eu.ill":
         level: ${VISA_LOGGING_LEVEL:INFO}
