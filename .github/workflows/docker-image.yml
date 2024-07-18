@@ -43,3 +43,5 @@ jobs:
           file       : ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+        env:
+          QUARKUS_PROFILE: dev
