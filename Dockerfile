@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN ./mvnw clean package -B -Dquarkus.package.type=uber-jar -DskipTests=true $MAVEN_OPTS
+RUN ./mvnw clean package -B -Dquarkus.profile=dev -Dquarkus.package.type=uber-jar -DskipTests=true $MAVEN_OPTS
 
 FROM amazoncorretto:21-alpine
 
