@@ -14,13 +14,11 @@ quarkus:
     database:
       generation: update
     log:
-      sql: false
+      sql: true
   scheduler:
     enabled: ${VISA_SCHEDULER_ENABLED:true}
   devservices:
     enabled: true
-  mailer:
-    enabled: ${VISA_NOTIFICATION_EMAIL_ADAPTER_ENABLED:false}
   rest-client:
 #    logging:
 #      scope: request-response
@@ -33,6 +31,7 @@ quarkus:
     resources:
       includes: images/thumbnail.jpg,fixtures/**.sql,words/**.txt,emails/templates/**.twig
   log:
+    level: DEBUG
     console:
       enable: true
     file:
