@@ -21,10 +21,10 @@ quarkus:
     enabled: true
   mailer:
     mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:false}
-    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST}
-    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT}
+    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST:}
+    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT:}
     logging:
-      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST}
+      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST:}
       port: ${VISA_LOGGING_EMAIL_APPENDER_PORT:25}
       ssl: ${VISA_LOGGING_EMAIL_APPENDER_SSL:false}
   rest-client:
@@ -40,9 +40,10 @@ quarkus:
       includes: images/thumbnail.jpg,fixtures/**.sql,words/**.txt,emails/templates/**.twig
   log:
     console:
+      enable: true
       filter: error-email-filter
     file:
-      enable: ${VISA_LOGGING_FILE_ENABLED:true}
+      enable: ${VISA_LOGGING_FILE_ENABLED:false}
       path: ${VISA_LOGGING_FILE_DIRECTORY:/tmp}/application.log
       format: ${VISA_LOGGING_FILE_FORMAT}
       level: ${VISA_LOGGING_FILE_THRESHOLD:INFO}
@@ -50,7 +51,7 @@ quarkus:
         max-file-size: ${VISA_LOGGING_FILE_MAX_FILE_SIZE:100M}
         max-backup-index: ${VISA_LOGGING_FILE_ARCHIVED_FILE_COUNT:0}
     syslog:
-      enable: ${VISA_LOGGING_SYSLOG_ENABLED:true}
+      enable: ${VISA_LOGGING_SYSLOG_ENABLED:false}
       syslog-type: ${VISA_LOGGING_SYSLOG_TYPE:rfc3164}
       endpoint: ${VISA_LOGGING_SYSLOG_ENDPOINT:logsrv.ill.fr:514}
       format: ${VISA_LOGGING_SYSLOG_FORMAT}
