@@ -20,11 +20,11 @@ quarkus:
   devservices:
     enabled: true
   mailer:
-    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:false}
-    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST:}
-    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT:}
+    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:true}
+    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST:localhost}
+    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT:25}
     logging:
-      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST:}
+      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST:localhost}
       port: ${VISA_LOGGING_EMAIL_APPENDER_PORT:25}
       ssl: ${VISA_LOGGING_EMAIL_APPENDER_SSL:false}
   rest-client:
@@ -41,7 +41,7 @@ quarkus:
   log:
     console:
       enable: true
-      filter: error-email-filter
+      filter: # error-email-filter
     file:
       enable: ${VISA_LOGGING_FILE_ENABLED:false}
       path: ${VISA_LOGGING_FILE_DIRECTORY:/tmp}/application.log
