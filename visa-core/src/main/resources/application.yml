@@ -186,8 +186,13 @@ graphql:
         generation: create
       sql-load-script: fixtures.sql
     datasource:
-      devservices:
-        enabled: true
+#      devservices:
+#        enabled: true
+      username: ${VISA_DATABASE_USERNAME}
+      password: ${VISA_DATABASE_PASSWORD}
+      jdbc:
+        url: ${VISA_DATABASE_URL_FULL}
+      db-kind: postgresql
     mailer:
       mock: true
       host: mailer.com
