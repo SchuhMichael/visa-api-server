@@ -1,4 +1,10 @@
 quarkus:
+  datasource:
+    username: ${VISA_DATABASE_USERNAME}
+    password: ${VISA_DATABASE_PASSWORD}
+    jdbc:
+      url: ${VISA_DATABASE_URL_FULL}
+    db-kind: postgresql
   http:
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
