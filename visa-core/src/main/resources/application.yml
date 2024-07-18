@@ -20,13 +20,7 @@ quarkus:
   devservices:
     enabled: true
   mailer:
-    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:true}
-    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST:localhost}
-    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT:25}
-    logging:
-      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST:localhost}
-      port: ${VISA_LOGGING_EMAIL_APPENDER_PORT:25}
-      ssl: ${VISA_LOGGING_EMAIL_APPENDER_SSL:false}
+    enabled: ${VISA_NOTIFICATION_EMAIL_ADAPTER_ENABLED:false}
   rest-client:
 #    logging:
 #      scope: request-response
@@ -41,7 +35,9 @@ quarkus:
   log:
     console:
       enable: true
-      filter: # error-email-filter
+    file:
+      rotation:
+        max-file-size: 100M
     category:
       "eu.ill":
         level: ${VISA_LOGGING_LEVEL:INFO}
@@ -92,7 +88,7 @@ business:
     adminEmailAddress: ${VISA_NOTIFICATION_EMAIL_ADAPTER_ADMIN_EMAIL_ADDRESS:}
     emailTemplatesDirectory: ${VISA_NOTIFICATION_EMAIL_ADAPTER_TEMPLATES_DIRECTORY:emails/templates/}
   errorReportEmail:
-    enabled: ${VISA_LOGGING_EMAIL_APPENDER_ENABLED:true}
+    enabled: ${VISA_LOGGING_EMAIL_APPENDER_ENABLED:false}
     to:
       - ${VISA_LOGGING_EMAIL_APPENDER_RECIPIENT_ADDRESS}
     from: ${VISA_LOGGING_EMAIL_APPENDER_FROM_ADDRESS}
