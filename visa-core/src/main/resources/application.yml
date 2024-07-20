@@ -31,7 +31,7 @@ quarkus:
     resources:
       includes: images/thumbnail.jpg,fixtures/**.sql,words/**.txt,emails/templates/**.twig
   log:
-    level: DEBUG
+    level: INFO
     console:
       enable: true
     file:
