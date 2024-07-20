@@ -22,4 +22,7 @@ COPY --from=builder /usr/src/app/db /app/db
 
 CMD java -jar /app/visa-app.jar
 
-EXPOSE 8086 8087
+EXPOSE 8080 8086 8087
+
+# Run the application in Quarkus Dev Mode
+CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
