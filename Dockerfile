@@ -1,3 +1,4 @@
+# Stage 1: Build the application
 FROM openjdk:21-jdk as builder
 
 ARG MAVEN_OPTS
@@ -10,19 +11,18 @@ COPY . /usr/src/app
 
 RUN ./mvnw clean package -B -Dquarkus.package.type=uber-jar -DskipTests=true $MAVEN_OPTS
 
+# Stage 2: Create the runtime image
 FROM amazoncorretto:21-alpine
 
 RUN mkdir -p /app
 
 WORKDIR /app
 
-# copy built application
-COPY --from=builder /usr/src/app/visa-app/target/visa-app-runner.jar /app/visa-app.jar
-COPY --from=builder /usr/src/app/db /app/db
+# Copy the Maven wrapper and application source code for dev mode
+COPY --from=builder /usr/src/app /app
 
-CMD java -jar /app/visa-app.jar
+# Expose the necessary ports
+EXPOSE 8080 5005
 
-EXPOSE 8080 8086 8087
-
-# Run the application in Quarkus Dev Mode
+# Run the application in Quarkus dev mode
 CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
