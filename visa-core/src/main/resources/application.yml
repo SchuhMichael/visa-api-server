@@ -1,5 +1,13 @@
 quarkus:
+  oidc:
+    auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
+    client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID}
   http:
+    auth:
+      permission:
+        dev-ui:
+          paths: /q/dev-ui/*
+          policy: authenticated
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
     host: ${VISA_SERVER_HOST:localhost}
@@ -9,7 +17,7 @@ quarkus:
       ~: true
       origins:  ${VISA_CORS_ORIGIN:*}
       methods: GET,POST,PATCH,PUT,DELETE,OPTIONS
-#      headers: Authorisation,Content-Type
+      # headers: Authorization,Content-Type
   hibernate-orm:
     database:
       generation: update
