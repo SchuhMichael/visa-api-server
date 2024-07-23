@@ -1,7 +1,13 @@
 quarkus:
+  package:
+    jar:
+      type: mutable-jar
+  live-reload:
+    password: ${VISA_DATABASE_PASSWORD}
+    url: ${VISA_SERVER_HOST:localhost}/api
   oidc:
-    auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
-    client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID}
+    auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER:}
+    client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID:}
     application-type: web-app
 # see note on quarkus.oidc.token-state-manager.encryption-secret in https://quarkus.io/guides/security-oidc-code-flow-authentication-tutorial
   http:
