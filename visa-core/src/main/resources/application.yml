@@ -171,6 +171,9 @@ graphql:
 
 "%dev":
   quarkus:
+    dev-ui: 
+      cors:
+        enabled: false
     datasource:
       username: ${VISA_DATABASE_USERNAME}
       password: ${VISA_DATABASE_PASSWORD}
