@@ -8,7 +8,7 @@ quarkus:
     auth:
       permission:
         dev-ui:
-          paths: /q/dev-ui/*
+          paths: /api/q/dev-ui/*
           policy: authenticated
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
