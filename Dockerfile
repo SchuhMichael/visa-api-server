@@ -20,7 +20,7 @@ WORKDIR /app
 
 # Copy the Maven wrapper and application source code for dev mode
 COPY --from=builder /usr/src/app /app
-RUN chmod o+rw -R /app
+
 # Expose the necessary ports
 EXPOSE 5005 8081 8086 8087 
 
