@@ -2,6 +2,9 @@ quarkus:
   oidc:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID}
+    application-type: web-app
+    token-state-manager:
+      encryption-secret: ${VISA_DATABASE_PASSWORD}
   http:
     auth:
       permission:
