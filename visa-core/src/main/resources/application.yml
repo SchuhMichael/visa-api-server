@@ -3,8 +3,7 @@ quarkus:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID}
     application-type: web-app
-    token-state-manager:
-      encryption-secret: ${VISA_DATABASE_PASSWORD}
+# see note on quarkus.oidc.token-state-manager.encryption-secret in https://quarkus.io/guides/security-oidc-code-flow-authentication-tutorial
   http:
     auth:
       permission:
@@ -18,9 +17,11 @@ quarkus:
     test-ssl-port: 8446
     cors:
       ~: true
-      origins:  ${VISA_CORS_ORIGIN:*}
+      origins:  ${VISA_ROOT_URL} # ${VISA_CORS_ORIGIN:*}
       methods: GET,POST,PATCH,PUT,DELETE,OPTIONS
-      # headers: Authorization,Content-Type
+      headers: accept,authorization,content-type,x-requested-with
+      exposed-headers: location,link
+      access-control-allow-credentials: true
   hibernate-orm:
     database:
       generation: update
