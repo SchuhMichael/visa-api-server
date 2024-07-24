@@ -24,6 +24,7 @@ COPY --from=builder /usr/src/app /app
 
 # Expose the necessary ports
 EXPOSE 5005 8081 8086 8087 
+RUN chmod -R og+rw /app
 
 # Run the application in Quarkus dev mode
 #CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
