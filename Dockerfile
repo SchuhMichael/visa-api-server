@@ -27,4 +27,4 @@ EXPOSE 5005 8081 8086 8087
 
 # Run the application in Quarkus dev mode
 #CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
-CMD ["java", "-jar", "/app/visa-app/target/quarkus-app/quarkus-run.jar"]
+CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]

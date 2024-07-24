@@ -29,11 +29,16 @@ import java.util.stream.Collectors;
 import static eu.ill.visa.core.entity.Role.*;
 import static eu.ill.visa.core.entity.enumerations.InstanceMemberRole.OWNER;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @Path("/account")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Authenticated
 public class AccountController extends AbstractController {
+    private final static Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     private final UserService userService;
     private final InstrumentService instrumentService;
@@ -81,6 +86,7 @@ public class AccountController extends AbstractController {
     @Path("/quotas")
     public MetaResponse<QuotaDto> quotas(@Context SecurityContext securityContext) {
         final User user = this.getUserPrincipal(securityContext);
+        logger.warn("Live  log output: Getting quotas for user");
         final QuotaDto dto = new QuotaDto();
         // the user has an invalid employee number... send defaults
         if ("0".equals(user.getId())) {
