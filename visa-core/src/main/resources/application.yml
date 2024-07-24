@@ -52,6 +52,7 @@ quarkus:
     level: INFO
     console:
       enable: true
+      json: false
     file:
       enable: false
     category:
