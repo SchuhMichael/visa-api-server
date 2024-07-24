@@ -45,7 +45,7 @@ public class InstanceStateJob {
         String[] statesString = {"BUILDING","STARTING","PARTIALLY_ACTIVE","REBOOTING","STOPPING","DELETED"};
         List<InstanceState> states = Arrays.stream(statesString).map(InstanceState::valueOf).toList();
         List<Instance> instances = this.instanceService.getAllWithStates(states);
-        logger.debug("Job running to update instance states which have states {} ({} instances)", statesString, instances.size());
+        logger.debug("LLLLLLLLL Job running to update instance states which have states {} ({} instances)", statesString, instances.size());
 
         this.updateInstancesStates(instances);
     }
