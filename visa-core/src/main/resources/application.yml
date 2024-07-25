@@ -5,7 +5,7 @@ quarkus:
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api
-    instrumentation: false
+    instrumentation: true
   oidc:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID:}
@@ -17,7 +17,7 @@ quarkus:
     auth:
       permission:
         dev-ui:
-          paths: /api/q/dev-ui/*
+          paths: /api/q/*
           policy: authenticated
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
