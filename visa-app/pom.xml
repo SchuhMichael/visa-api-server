@@ -59,7 +59,7 @@
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.platform.version}</version>
+                <version>3.12.3</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
