@@ -1,5 +1,5 @@
 quarkus:
-  smallrye-context-propagation:
+  quarkus-smallrye-context-propagation:
     enabled: true
   package:
     jar:
