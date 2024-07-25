@@ -28,4 +28,5 @@ RUN chmod -R og+rw /app
 
 # Run the application in Quarkus dev mode
 #CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
-CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
+# CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
+CMD ["java", "-jar", "visa-app/target/visa-app.jar"]
