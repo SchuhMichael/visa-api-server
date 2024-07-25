@@ -10,6 +10,8 @@ quarkus:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID:}
     application-type: web-app
+    token-state-manager:
+      encryption-secret: oaDedeefulodiv9noeTho0eilai6reg8
 # see note on quarkus.oidc.token-state-manager.encryption-secret in https://quarkus.io/guides/security-oidc-code-flow-authentication-tutorial
   http:
     auth:

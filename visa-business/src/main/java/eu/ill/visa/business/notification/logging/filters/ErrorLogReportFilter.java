@@ -15,7 +15,7 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-@LoggingFilter(name = "error-email-filter")
+//   @LoggingFilter(name = "error-email-filter")
 public class ErrorLogReportFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorLogReportFilter.class);
