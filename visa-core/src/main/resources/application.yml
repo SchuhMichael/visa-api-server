@@ -17,11 +17,13 @@ quarkus:
     auth:
       permission:
         dev-ui:
-          paths: /api/q/*
+          paths: /api/q/dev-ui
           policy: authenticated
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
     host: ${VISA_SERVER_HOST:localhost}
+    websocket-port: ${VISA_VDI_PORT:8087}
+    substrate: ${VISA_VDI_PORT:8087}
     test-port: 8081
     test-ssl-port: 8446
     cors:
@@ -31,6 +33,8 @@ quarkus:
       headers: accept,authorization,content-type,x-requested-with
       exposed-headers: location,link
       access-control-allow-credentials: true
+  websocket:
+    cors: true
   hibernate-orm:
     database:
       generation: update
