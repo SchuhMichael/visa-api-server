@@ -1,5 +1,6 @@
 package eu.ill.visa.business.concurrent.actions;
 
+import eu.ill.visa.broker.EventDispatcher;
 import eu.ill.visa.business.notification.EmailManager;
 import eu.ill.visa.business.services.*;
 import eu.ill.visa.cloud.services.CloudClient;
@@ -23,6 +24,8 @@ public class InstanceActionServiceProvider {
     private final InstrumentService instrumentService;
     private final SignatureService signatureService;
     private final CloudClientService cloudClientService;
+    private final PortService portService;
+    private final EventDispatcher eventDispatcher;
 
 
     @Inject
@@ -33,7 +36,9 @@ public class InstanceActionServiceProvider {
                                          final InstrumentService instrumentService,
                                          final CloudClientService cloudClientService,
                                          final EmailManager emailManager,
-                                         final SignatureService signatureService) {
+                                         final SignatureService signatureService,
+                                         final PortService portService,
+                                         final EventDispatcher eventDispatcher) {
         this.instanceService = instanceService;
         this.instanceSessionService = instanceSessionService;
         this.instanceCommandService = instanceCommandService;
@@ -42,6 +47,8 @@ public class InstanceActionServiceProvider {
         this.cloudClientService = cloudClientService;
         this.emailManager = emailManager;
         this.signatureService = signatureService;
+        this.portService = portService;
+        this.eventDispatcher = eventDispatcher;
     }
 
     /**
@@ -56,7 +63,7 @@ public class InstanceActionServiceProvider {
             this.instanceSessionService.save(session);
         }
 
-        final List<InstanceSessionMember> sessionMembers = this.instanceSessionService.getAllSessionMembers(instance);
+        final List<InstanceSessionMember> sessionMembers = this.instanceSessionService.getAllSessionMembersByInstance(instance);
         for (InstanceSessionMember member : sessionMembers) {
             member.setActive(false);
             this.instanceSessionService.saveInstanceSessionMember(member);
@@ -89,5 +96,13 @@ public class InstanceActionServiceProvider {
 
     public SignatureService getSignatureService() {
         return signatureService;
+    }
+
+    public PortService getPortService() {
+        return portService;
+    }
+
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
     }
 }

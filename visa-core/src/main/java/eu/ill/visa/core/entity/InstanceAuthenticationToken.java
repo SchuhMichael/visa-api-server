@@ -10,9 +10,11 @@ import java.util.Date;
     @NamedQuery(name = "instanceAuthenticationToken.getByToken", query = """
             SELECT i FROM InstanceAuthenticationToken i
             WHERE i.token = :token
+            AND i.instance.deletedAt IS NULL
     """),
     @NamedQuery(name = "instanceAuthenticationToken.getAll", query = """
             SELECT i FROM InstanceAuthenticationToken i
+            WHERE i.instance.deletedAt IS NULL
     """),
 })
 @Table(name = "instance_authentication_token")

@@ -4,7 +4,6 @@ import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithName;
 
 import java.util.Map;
-import java.util.Optional;
 
 @ConfigMapping(prefix = "vdi", namingStrategy = ConfigMapping.NamingStrategy.VERBATIM)
 public interface VirtualDesktopConfiguration {
@@ -14,27 +13,9 @@ public interface VirtualDesktopConfiguration {
 
     boolean enabled();
 
-    Integer port();
-
-    String host();
-
-    String corsOrigin();
-
-    boolean redisEnabled();
-
-    Optional<String> redisURL();
-
-    Optional<String> redisPassword();
-
-    Integer redisDatabase();
-
     String ownerDisconnectionPolicy();
 
     boolean cleanupSessionsOnStartup();
-
-    int pingTimeout();
-
-    int pingInterval();
 
     String protocol();
 

@@ -50,8 +50,6 @@ quarkus:
 #      body-limit: 1000
     account-service:
       url: ${VISA_ACCOUNTS_SERVICE_CLIENT_URL}
-    security-group-service:
-      url: ${VISA_SECURITY_GROUP_SERVICE_CLIENT_URL}
   native:
     resources:
       includes: images/thumbnail.jpg,fixtures/**.sql,words/**.txt,emails/templates/**.twig
@@ -66,7 +64,7 @@ quarkus:
       "eu.ill":
         level: ${VISA_LOGGING_LEVEL:INFO}
       "org.apache.guacamole":
-        level: DEBUG
+        level: INFO
 #      "org.jboss.resteasy.reactive.client.logging":
 #        level: DEBUG
 
@@ -103,6 +101,7 @@ business:
     staffMaxInactivityDurationHours: ${VISA_INSTANCE_STAFF_MAX_INACTIVITY_DURATION_HOURS:192}
     defaultUserInstanceQuota: ${VISA_INSTANCE_USER_DEFAULT_QUOTA:2}
     activityRetentionPeriodDays: ${VISA_INSTANCE_ACTIVITY_RETENTION_PERIOD_DAYS:0}
+    portCheckTimeoutMs: ${VISA_INSTANCE_PORT_CHECK_TIMEOUT_MS:1000}
   mailer:
     rootURL: ${VISA_ROOT_URL}
     enabled: ${VISA_NOTIFICATION_EMAIL_ADAPTER_ENABLED:false}
@@ -126,21 +125,16 @@ business:
     url: ${VISA_SECURITY_GROUP_SERVICE_CLIENT_URL}
     authToken: ${VISA_SECURITY_GROUP_SERVICE_CLIENT_AUTH_TOKEN}
 
-vdi:
-  enabled: ${VISA_VDI_ENABLED:true}
-  host: ${VISA_VDI_HOST:localhost}
-  port: ${VISA_VDI_PORT:8087}
-  corsOrigin: ${VISA_VDI_CORS_ORIGIN:*}
+broker:
   redisEnabled: ${VISA_VDI_REDIS_ENABLED:false}
   redisURL: ${VISA_VDI_REDIS_URL}
   redisPassword: ${VISA_VDI_REDIS_PASSWORD}
   redisDatabase: ${VISA_VDI_REDIS_DATABASE:0}
+
+vdi:
+  enabled: ${VISA_VDI_ENABLED:true}
   ownerDisconnectionPolicy: ${VISA_VDI_OWNER_DISCONNECTION_POLICY:DISCONNECT_ALL}
   cleanupSessionsOnStartup: ${VISA_VDI_CLEANUP_SESSIONS_ON_STARTUP:false}
-  # in milliseconds....
-  pingTimeout: ${VISA_VDI_PING_TIMEOUT:15000}
-  # in milliseconds...
-  pingInterval: ${VISA_VDI_PING_INTERVAL:3000}
   protocol: ${VISA_VDI_GUACD_PARAMETER_PROTOCOL:rdp}
   guacd:
     ignore-cert: ${VISA_VDI_GUACD_PARAMETER_IGNORE_CERT:true}
@@ -180,6 +174,11 @@ graphql:
       jdbc:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
+    redis:
+      hosts-provider-name: redis-pubsub-hosts-provider
+      #    max-pool-size: 24
+      devservices:
+        enabled: false
 
 
 "%dev":
@@ -193,7 +192,11 @@ graphql:
       jdbc: 
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
-      db-name: ${VISA_DATABASE_USERNAME}
+    redis:
+      hosts-provider-name: $VISA_VDI_REDIS_URL
+      #    max-pool-size: 24
+      devservices:
+        enabled: false
 
 "%test":
   quarkus:

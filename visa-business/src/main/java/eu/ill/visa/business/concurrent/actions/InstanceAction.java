@@ -1,5 +1,6 @@
 package eu.ill.visa.business.concurrent.actions;
 
+import eu.ill.visa.broker.EventDispatcher;
 import eu.ill.visa.business.concurrent.actions.exceptions.InstanceActionException;
 import eu.ill.visa.business.notification.EmailManager;
 import eu.ill.visa.business.services.*;
@@ -53,6 +54,14 @@ public abstract class InstanceAction {
         return this.serviceProvider.getSignatureService();
     }
 
+    public PortService getPortService() {
+        return this.serviceProvider.getPortService();
+    }
+
+    public EventDispatcher getEventDispatcher() {
+        return this.serviceProvider.getEventDispatcher();
+    }
+
     public InstanceCommand getCommand() {
         return command;
     }
@@ -93,13 +102,14 @@ public abstract class InstanceAction {
         }
     }
 
-    public void updateInstanceProtocols(List<ImageProtocol> activeProtocols) {
+    public void updateInstanceProtocols(InstanceState instanceState, List<ImageProtocol> activeProtocols) {
         Instance commandInstance = this.command.getInstance();
         List<String> protocolNames = activeProtocols.stream().map(ImageProtocol::getName).collect(Collectors.toList());
         commandInstance.setActiveProtocols(protocolNames);
 
         Instance instance = this.getInstance();
         if (instance != null) {
+            instance.setState(instanceState);
             instance.setActiveProtocols(protocolNames);
             this.getInstanceService().save(instance);
         }

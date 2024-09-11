@@ -1,6 +1,7 @@
 package eu.ill.visa.business.services;
 
 import eu.ill.visa.core.entity.*;
+import eu.ill.visa.core.entity.enumerations.InstanceMemberRole;
 import eu.ill.visa.persistence.repositories.InstanceSessionMemberRepository;
 import eu.ill.visa.persistence.repositories.InstanceSessionRepository;
 import jakarta.inject.Inject;
@@ -11,7 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 @Transactional
 @Singleton
@@ -23,16 +25,19 @@ public class InstanceSessionService {
     private final InstanceSessionMemberRepository instanceSessionMemberRepository;
     private final InstanceJupyterSessionService instanceJupyterSessionService;
     private final InstanceService instanceService;
+    private final UserService userService;
 
     @Inject
     public InstanceSessionService(final InstanceSessionRepository repository,
                                   final InstanceSessionMemberRepository instanceSessionMemberRepository,
                                   final InstanceJupyterSessionService instanceJupyterSessionService,
-                                  final InstanceService instanceService) {
+                                  final InstanceService instanceService,
+                                  final UserService userService) {
         this.repository = repository;
         this.instanceSessionMemberRepository = instanceSessionMemberRepository;
         this.instanceJupyterSessionService = instanceJupyterSessionService;
         this.instanceService = instanceService;
+        this.userService = userService;
     }
 
     public List<InstanceSession> getAll() {
@@ -43,8 +48,8 @@ public class InstanceSessionService {
         return this.repository.getById(id);
     }
 
-    public InstanceSession create(@NotNull Instance instance, String connectionId) {
-        InstanceSession session = new InstanceSession(instance, connectionId);
+    public InstanceSession create(@NotNull Instance instance, String protocol, String connectionId) {
+        InstanceSession session = new InstanceSession(instance, protocol, connectionId);
 
         this.save(session);
 
@@ -59,53 +64,65 @@ public class InstanceSessionService {
         return this.repository.getAllByInstance(instance);
     }
 
+    public InstanceSession getByInstanceAndProtocol(@NotNull Instance instance, String protocol) {
+        return this.getByInstanceIdAndProtocol(instance.getId(), protocol);
+    }
+
+    public InstanceSession getByInstanceIdAndProtocol(Long instanceId, String protocol) {
+        return this.repository.getByInstanceIdAndProtocol(instanceId, protocol);
+    }
+
     public void save(@NotNull InstanceSession instanceSession) {
         this.repository.save(instanceSession);
     }
 
-    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID sessionId, User user, String role) {
-        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, sessionId.toString(), user, role);
+    public void addInstanceSessionMember(@NotNull InstanceSession instanceSession, String memberId, User user, String role) {
+        InstanceSessionMember sessionMember = new InstanceSessionMember(instanceSession, memberId, user, role);
         sessionMember.setActive(true);
 
         this.instanceSessionMemberRepository.save(sessionMember);
     }
 
-    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, UUID sessionId) {
-        InstanceSessionMember sessionMember = this.instanceSessionMemberRepository.getSessionMember(instanceSession, sessionId.toString());
+    public void removeInstanceSessionMember(@NotNull InstanceSession instanceSession, String memberId) {
+        InstanceSessionMember sessionMember = this.instanceSessionMemberRepository.getSessionMember(instanceSession, memberId);
         if (sessionMember != null) {
             sessionMember.setActive(false);
             this.instanceSessionMemberRepository.save(sessionMember);
 
-            List<InstanceSessionMember> members = this.instanceSessionMemberRepository.getAllSessionMembers(instanceSession);
+            List<InstanceSessionMember> members = this.getAllSessionMembersByInstanceSessionId(instanceSession.getId());
 
-            if (members.size() == 0) {
+            if (members.isEmpty()) {
                 logger.info("Session for Instance with Id: {} is no longer current as it has no connected members", instanceSession.getInstance().getId());
                 instanceSession.setCurrent(false);
             }
             this.repository.save(instanceSession);
         } else {
-            logger.warn("Got a null session member (session {}) for instance {}", sessionId.toString(), instanceSession.getInstance().getId());
+            logger.warn("Got a null session member (memberId {}) for instance {}", memberId, instanceSession.getInstance().getId());
         }
     }
 
-    public List<InstanceSessionMember> getAllSessionMembers(@NotNull InstanceSession instanceSession) {
-        return this.instanceSessionMemberRepository.getAllSessionMembers(instanceSession);
+    public List<InstanceSessionMember> getAllSessionMembersByInstanceSession(@NotNull InstanceSession instanceSession) {
+        return this.getAllSessionMembersByInstanceSessionId(instanceSession.getId());
+    }
+
+    public List<InstanceSessionMember> getAllSessionMembersByInstanceSessionId(@NotNull Long sessionId) {
+        return this.instanceSessionMemberRepository.getAllSessionMembersByInstanceSessionId(sessionId);
     }
 
     public List<InstanceSessionMember> getAllHistorySessionMembersByInstanceId(final Long instanceId) {
         return this.instanceSessionMemberRepository.getAllHistorySessionMembersByInstanceId(instanceId);
     }
 
-    public List<InstanceSessionMember> getAllSessionMembers(@NotNull Instance instance) {
-        return this.instanceSessionMemberRepository.getAllSessionMembers(instance);
+    public List<InstanceSessionMember> getAllSessionMembersByInstance(@NotNull Instance instance) {
+        return this.getAllSessionMembersByInstanceId(instance.getId());
     }
 
     public List<InstanceSessionMember> getAllSessionMembersByInstanceId(@NotNull Long instanceId) {
         return this.instanceSessionMemberRepository.getAllSessionMembersByInstanceId(instanceId);
     }
 
-    public InstanceSessionMember getSessionMemberBySessionId(UUID sessionId) {
-        return this.instanceSessionMemberRepository.getBySessionId(sessionId.toString());
+    public InstanceSessionMember getSessionMemberBySessionId(String sessionId) {
+        return this.instanceSessionMemberRepository.getBySessionId(sessionId);
     }
 
     public void saveInstanceSessionMember(InstanceSessionMember instanceSessionMember) {
@@ -129,7 +146,8 @@ public class InstanceSessionService {
         this.instanceJupyterSessionService.cleanupSession();
     }
 
-    public boolean canConnectWhileOwnerAway(Instance instance, User user) {
+    public boolean canConnectWhileOwnerAway(Instance instance, String userId) {
+        final User user = this.userService.getById(userId);
         boolean userIsOwner = instance.isOwner(user);
 
         // The user is the owner
@@ -152,5 +170,20 @@ public class InstanceSessionService {
         }
 
         return false;
+    }
+
+    public InstanceMemberRole getUserSessionRole(final Instance instance, final User user) {
+        requireNonNull(instance, "instance cannot be null");
+        requireNonNull(user, "user cannot be null");
+
+        final InstanceMember member = instance.getMember(user);
+        if (member == null) {
+            if (user.hasAnyRole(List.of(Role.ADMIN_ROLE, Role.IT_SUPPORT_ROLE, Role.INSTRUMENT_CONTROL_ROLE, Role.INSTRUMENT_SCIENTIST_ROLE))) {
+                return InstanceMemberRole.SUPPORT;
+            }
+
+            return InstanceMemberRole.NONE;
+        }
+        return member.getRole();
     }
 }

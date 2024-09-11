@@ -8,41 +8,59 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "instanceSessionMember.getAll", query = """
             SELECT i FROM InstanceSessionMember i
+            LEFT JOIN i.instanceSession instanceSession
+            LEFT JOIN instanceSession.instance instance
             WHERE i.active = true
+            AND instance.deletedAt IS NULL
     """),
     @NamedQuery(name = "instanceSessionMember.getByInstanceSessionAndSessionId", query = """
             SELECT i FROM InstanceSessionMember i
-            WHERE i.instanceSession = :instanceSession
+            LEFT JOIN i.instanceSession instanceSession
+            LEFT JOIN instanceSession.instance instance
+            WHERE instanceSession = :instanceSession
             AND i.sessionId = :sessionId
             AND i.active = true
+            AND instance.deletedAt IS NULL
     """),
-    @NamedQuery(name = "instanceSessionMember.getAllForInstanceSession", query = """
-            SELECT i FROM InstanceSessionMember i
-            WHERE i.instanceSession = :instanceSession
-            AND i.active = true
-    """),
-    @NamedQuery(name = "instanceSessionMember.getAllForInstance", query = """
+    @NamedQuery(name = "instanceSessionMember.getAllByInstanceSessionId", query = """
             SELECT i FROM InstanceSessionMember i
             LEFT JOIN i.instanceSession instanceSession
-            WHERE instanceSession.instance = :instance
+            LEFT JOIN instanceSession.instance instance
+            WHERE i.instanceSession.id = :instanceSessionId
             AND i.active = true
+            AND instance.deletedAt IS NULL
     """),
-    @NamedQuery(name = "instanceSessionMember.getAllForInstanceByInstanceId", query = """
+    @NamedQuery(name = "instanceSessionMember.getAllForInstanceId", query = """
             SELECT i FROM InstanceSessionMember i
             LEFT JOIN i.instanceSession instanceSession
-            WHERE instanceSession.instance.id = :instanceId
+            LEFT JOIN instanceSession.instance instance
+            WHERE instance.id = :instanceId
             AND i.active = true
+            AND instance.deletedAt IS NULL
     """),
-    @NamedQuery(name = "instanceSessionMember.getAllHistoryForInstanceByInstanceId", query = """
+    @NamedQuery(name = "instanceSessionMember.getAllByConnectionId", query = """
             SELECT i FROM InstanceSessionMember i
             LEFT JOIN i.instanceSession instanceSession
-            WHERE instanceSession.instance.id = :instanceId
+            LEFT JOIN instanceSession.instance instance
+            WHERE instanceSession.connectionId = :connectionId
+            AND i.active = true
+            AND instance.deletedAt IS NULL
+    """),
+    @NamedQuery(name = "instanceSessionMember.getAllHistoryForInstanceId", query = """
+            SELECT i FROM InstanceSessionMember i
+            LEFT JOIN i.instanceSession instanceSession
+            LEFT JOIN instanceSession.instance instance
+            WHERE instance.id = :instanceId
+            AND instance.deletedAt IS NULL
             ORDER BY i.id DESC
     """),
     @NamedQuery(name = "instanceSessionMember.getBySessionId", query = """
             SELECT i FROM InstanceSessionMember i
+            LEFT JOIN i.instanceSession instanceSession
+            LEFT JOIN instanceSession.instance instance
             WHERE i.sessionId = :sessionId
             AND i.active = true
+            AND instance.deletedAt IS NULL
     """),
 })
 @Table(name = "instance_session_member")

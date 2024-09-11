@@ -21,9 +21,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.SecurityContext;
+import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.ImageFormats;
+import org.apache.commons.imaging.Imaging;
+import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +55,6 @@ public class AccountInstanceController extends AbstractController {
     private final InstanceMemberService instanceMemberService;
     private final InstanceSessionService instanceSessionService;
     private final InstanceCommandService instanceCommandService;
-    private final InstanceExpirationService instanceExpirationService;
     private final InstanceExtensionRequestService instanceExtensionRequestService;
     private final InstanceAuthenticationTokenService instanceAuthenticationTokenService;
     private final PlanService planService;
@@ -66,7 +70,6 @@ public class AccountInstanceController extends AbstractController {
                                      final InstanceMemberService instanceMemberService,
                                      final InstanceSessionService instanceSessionService,
                                      final InstanceCommandService instanceCommandService,
-                                     final InstanceExpirationService instanceExpirationService,
                                      final InstanceExtensionRequestService instanceExtensionRequestService,
                                      final InstanceAuthenticationTokenService instanceAuthenticationTokenService,
                                      final PlanService planService,
@@ -79,7 +82,6 @@ public class AccountInstanceController extends AbstractController {
         this.instanceMemberService = instanceMemberService;
         this.instanceSessionService = instanceSessionService;
         this.instanceCommandService = instanceCommandService;
-        this.instanceExpirationService = instanceExpirationService;
         this.instanceExtensionRequestService = instanceExtensionRequestService;
         this.instanceAuthenticationTokenService = instanceAuthenticationTokenService;
         this.planService = planService;
@@ -199,7 +201,6 @@ public class AccountInstanceController extends AbstractController {
 
         if (this.instanceService.isAuthorisedForInstance(user, instance)) {
             InstanceStateDto instanceStateDto = new InstanceStateDto(instance);
-            instanceStateDto.setExpirationDate(instanceExpirationService.getExpirationDate(instance));
             return createResponse(instanceStateDto);
         }
 
@@ -391,7 +392,7 @@ public class AccountInstanceController extends AbstractController {
         final User user = this.getUserPrincipal(securityContext);
 
         if (this.instanceService.isAuthorisedForInstance(user, instance)) {
-            List<InstanceSessionMember> sessionMembers = this.instanceSessionService.getAllSessionMembers(instance);
+            List<InstanceSessionMember> sessionMembers = this.instanceSessionService.getAllSessionMembersByInstance(instance);
 
             return createResponse(sessionMembers.stream()
                 .peek(instanceSessionMember -> instanceSessionMember.getInstanceSession().setInstance(instance))
@@ -557,8 +558,7 @@ public class AccountInstanceController extends AbstractController {
         } else if (user.hasAnyRole(List.of(Role.IT_SUPPORT_ROLE, Role.INSTRUMENT_CONTROL_ROLE, Role.INSTRUMENT_SCIENTIST_ROLE))) {
             instanceDto.setMembership(new InstanceMemberDto(this.mapUser(user), SUPPORT));
         }
-        instanceDto.setExpirationDate(instanceExpirationService.getExpirationDate(instance));
-        instanceDto.setCanConnectWhileOwnerAway(instanceSessionService.canConnectWhileOwnerAway(instance, user));
+        instanceDto.setCanConnectWhileOwnerAway(instanceSessionService.canConnectWhileOwnerAway(instance, user.getId()));
         instanceDto.setUnrestrictedAccess((instance.getUnrestrictedMemberAccess() != null));
 
         return instanceDto;
@@ -568,6 +568,26 @@ public class AccountInstanceController extends AbstractController {
         return new UserDto(user);
     }
 
+    @POST
+    @Path("/{instance}/thumbnail")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public void createThumbnail(@Context final SecurityContext securityContext,
+                                @PathParam("instance") final Instance instance,
+                                @NotNull @RestForm("file") final InputStream is) {
+        try {
+            final User user = this.getUserPrincipal(securityContext);
+            if (this.instanceService.isOwnerOrAdmin(user, instance)) {
+                final byte[] data = is.readAllBytes();
+                final ImageFormat mimeType = Imaging.guessFormat(data);
+                if (mimeType == ImageFormats.JPEG) {
+                    instanceService.createOrUpdateThumbnail(instance, data);
+                }
+            }
+
+        } catch (Exception exception) {
+            logger.error("Error creating thumbnail for instance: {}", instance.getId(), exception);
+        }
+    }
 
     @GET
     @Path("/{instance}/thumbnail")
@@ -612,14 +632,14 @@ public class AccountInstanceController extends AbstractController {
     @Path("/{instance}/extension")
     public MetaResponse<InstanceExtensionRequestDto> createInstanceExtensionRequest(@Context final SecurityContext securityContext,
                               @PathParam("instance") final Instance instance,
-                              @Valid @NotNull final InstanceExtensionRequestDto instanceExtensionRequestDto) {
+                              @Valid @NotNull final InstanceExtensionRequestInput instanceExtensionRequestInput) {
         final User user = this.getUserPrincipal(securityContext);
         if (this.instanceService.isOwnerOrAdmin(user, instance)) {
 
             // Check an existing request hasn't already been made
             InstanceExtensionRequest request = this.instanceExtensionRequestService.getForInstance(instance);
             if (request == null) {
-                request = this.instanceExtensionRequestService.create(instance, instanceExtensionRequestDto.getComments());
+                request = this.instanceExtensionRequestService.create(instance, instanceExtensionRequestInput.getComments());
             }
             InstanceExtensionRequestDto requestDto = new InstanceExtensionRequestDto(request);
             return createResponse(requestDto);

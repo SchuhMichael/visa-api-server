@@ -1,7 +1,7 @@
 package eu.ill.visa.business.concurrent.actions;
 
 import eu.ill.visa.business.concurrent.actions.exceptions.InstanceActionException;
-import eu.ill.visa.business.services.PortService;
+import eu.ill.visa.business.gateway.AdminEvent;
 import eu.ill.visa.cloud.domain.CloudInstance;
 import eu.ill.visa.cloud.domain.CloudInstanceState;
 import eu.ill.visa.cloud.services.CloudClient;
@@ -35,11 +35,13 @@ public class StateInstanceAction extends InstanceAction {
                 return;
             }
 
+            InstanceState oldState = instance.getState();
+
             CloudInstance cloudInstance = cloudClient.instance(instance.getComputeId());
 
             InstanceState instanceState;
             if (cloudInstance == null) {
-                logger.warn("Instance {} has been deleted on the Open Stack server", instance.getComputeId());
+                logger.warn("Instance {} has been deleted on the cloud provider", instance.getComputeId());
                 instanceState = InstanceState.DELETED;
                 this.updateInstanceState(instanceState);
                 this.updateInstanceIpAddress(null);
@@ -63,22 +65,25 @@ public class StateInstanceAction extends InstanceAction {
                         final Plan plan = instance.getPlan();
                         final Image image = plan.getImage();
                         final List<ImageProtocol> protocols = image.getProtocols();
-                        boolean instanceIsUpAndRunning = PortService.areMandatoryPortsOpen(cloudInstance.getAddress(), protocols);
+                        boolean instanceIsUpAndRunning = this.getPortService().areMandatoryPortsOpen(cloudInstance.getAddress(), protocols);
                         if (!instanceIsUpAndRunning) {
                             instanceState = InstanceState.STARTING;
 
                         } else {
-                            List<ImageProtocol> activeProtocols = PortService.getActiveProtocols(cloudInstance.getAddress(), protocols);
+                            List<ImageProtocol> activeProtocols = this.getPortService().getActiveProtocols(cloudInstance.getAddress(), protocols);
                             if (activeProtocols.size() < protocols.size()) {
                                 instanceState = InstanceState.PARTIALLY_ACTIVE;
-                            } else {
-
                             }
-                            this.updateInstanceProtocols(activeProtocols);
+                            this.updateInstanceProtocols(instanceState, activeProtocols);
                         }
                     }
                     this.updateInstanceState(instanceState);
                 }
+            }
+
+            // Check to see if instance state has changed from or to an error
+            if ((oldState.equals(InstanceState.ERROR) && !instanceState.equals(InstanceState.ERROR)) || (!oldState.equals(InstanceState.ERROR) && instanceState.equals(InstanceState.ERROR))) {
+                this.getEventDispatcher().sendEventForRole(Role.ADMIN_ROLE, AdminEvent.INSTANCE_ERRORS_CHANGED);
             }
 
         } catch (Exception exception) {

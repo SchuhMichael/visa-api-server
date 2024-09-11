@@ -39,6 +39,11 @@
         </dependency>
         <dependency>
             <groupId>eu.ill.visa</groupId>
+            <artifactId>visa-web-gateway</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.ill.visa</groupId>
             <artifactId>visa-remote-desktop</artifactId>
             <version>3.0.0</version>
         </dependency>
@@ -162,8 +167,8 @@
                 </plugins>
             </build>
             <properties>
-                <quarkus.native.additional-build-args>--initialize-at-run-time=eu.ill.visa.business.services.InstanceNameGeneratorService</quarkus.native.additional-build-args>
-                <quarkus.package.type>mutable-jar</quarkus.package.type>
+                <quarkus.native.additional-build-args>--initialize-at-run-time=eu.ill.visa.business.services.InstanceNameGeneratorService\,zmq.util.Utils</quarkus.native.additional-build-args>
+                <quarkus.package.type>native</quarkus.package.type>
             </properties>
         </profile>
     </profiles>
