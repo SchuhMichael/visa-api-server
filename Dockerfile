@@ -26,15 +26,14 @@ WORKDIR /app
 # Copy the Maven wrapper and application source code for dev mode
 COPY --from=builder /usr/src/app /app
 
-# Run the application 
-CMD java -jar /app/visa-app.jar
-EXPOSE 8086 8087 
-# EXPOSE 5005 8081 8086 8087 
 
-# For running the application in Quarkus dev mode
-# CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
-# CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
-# RUN chmod -R og+rw /app
+# EXPOSE 8086 8087 
+EXPOSE 5005 8081 8086 8087 
+
+# Run the application 
+#CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
+CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
+# CMD ["java", "-jar", "visa-app/target/visa-app.jar"]
 
 
 
