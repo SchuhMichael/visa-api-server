@@ -1,7 +1,7 @@
 quarkus:
   package:
     jar:
-      type: mutable-jar
+      type: uber-jar
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api
@@ -193,7 +193,7 @@ graphql:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
     redis:
-      hosts-provider-name: $VISA_VDI_REDIS_URL
+      hosts-provider-name: ${VISA_VDI_REDIS_URL}
       #    max-pool-size: 24
       devservices:
         enabled: false
