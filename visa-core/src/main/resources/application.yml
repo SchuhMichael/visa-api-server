@@ -175,9 +175,9 @@ graphql:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
     redis:
-      # hosts-provider-name: redis-pubsub-hosts-provider
+      hosts-provider-name: redis-pubsub-hosts-provider
       #    max-pool-size: 24
-      hosts: ${VISA_VDI_REDIS_URL}
+      # hosts: ${VISA_VDI_REDIS_URL}
       devservices:
         enabled: false
 
@@ -194,9 +194,9 @@ graphql:
         url: ${VISA_DATABASE_URL_FULL}
       db-kind: postgresql
     redis:
-      # hosts-provider-name: ${VISA_VDI_REDIS_URL}
+      hosts-provider-name: ${VISA_VDI_REDIS_URL}
       #    max-pool-size: 24
-      hosts: ${VISA_VDI_REDIS_URL}
+      # hosts: ${VISA_VDI_REDIS_URL}
       devservices:
         enabled: false
 
