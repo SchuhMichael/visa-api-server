@@ -1,6 +1,7 @@
 package eu.ill.visa.security.authenticator;
 
 import eu.ill.visa.business.services.UserService;
+import eu.ill.visa.core.entity.Employer;
 import eu.ill.visa.core.entity.User;
 import eu.ill.visa.security.tokens.AccountToken;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -105,6 +106,13 @@ public class AccountTokenAuthenticator {
         // Set activated date if not already
         if (user.getActivatedAt() == null) {
             user.setActivatedAt(new Date());
+        }
+
+        // Set affiliation if not already
+        if (user.getAffiliation() == null) {
+            Employer affiliation = new Employer();
+            affiliation.setId(0);
+            user.setAffiliation(affiliation);
         }
 
         user.setLastSeenAt(new Date());
