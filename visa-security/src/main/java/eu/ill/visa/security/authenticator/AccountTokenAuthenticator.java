@@ -111,7 +111,7 @@ public class AccountTokenAuthenticator {
         // Set affiliation if not already
         if (user.getAffiliation() == null) {
             Employer affiliation = new Employer();
-            affiliation.setId(0);
+            affiliation.setId(0L);
             user.setAffiliation(affiliation);
         }
 
