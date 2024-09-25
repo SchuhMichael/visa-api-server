@@ -22,10 +22,6 @@ quarkus:
     root-path: /api
     port: ${VISA_SERVER_PORT:8086}
     host: ${VISA_SERVER_HOST:localhost}
-    websocket-port: ${VISA_VDI_PORT:8087}
-    substrate: ${VISA_VDI_PORT:8087}
-    test-port: 8081
-    test-ssl-port: 8446
     cors:
       ~: true
       origins:  ${VISA_ROOT_URL} # ${VISA_CORS_ORIGIN:*}
