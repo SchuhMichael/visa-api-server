@@ -182,8 +182,6 @@ graphql:
   quarkus:
     banner:
       enabled: true
-    log:
-      level: INFO
     dev-ui: 
       cors:
         enabled: false
