@@ -29,6 +29,15 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-maven-plugin</artifactId>
             <version>3.15.0</version>
+                    <executions>                
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>    
+                    </execution>
+                </executions>                  
         </plugin>
 
             <plugin>
@@ -87,11 +96,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-websockets</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

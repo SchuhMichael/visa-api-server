@@ -25,6 +25,15 @@
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>3.15.0</version>
+                    <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>    
+                    </execution>          
+                                        </executions>            
             </plugin>
             <plugin>
                 <groupId>io.smallrye</groupId>
@@ -48,6 +57,10 @@
             <groupId>eu.ill.visa</groupId>
             <artifactId>visa-business</artifactId>
             <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-websockets</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.ill.visa</groupId>
