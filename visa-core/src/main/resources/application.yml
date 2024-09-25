@@ -1,4 +1,6 @@
 quarkus:
+  mailer:
+    tls: false
   package:
     jar:
       type: mutable-jar
