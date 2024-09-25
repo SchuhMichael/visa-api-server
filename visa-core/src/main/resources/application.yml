@@ -1,7 +1,7 @@
 quarkus:
   package:
     jar:
-      type: uber-jar
+      type: mutable-jar
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api
