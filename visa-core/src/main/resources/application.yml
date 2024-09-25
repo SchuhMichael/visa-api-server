@@ -180,6 +180,8 @@ graphql:
 
 "%dev":
   quarkus:
+    log:
+      level: DEBUG
     dev-ui: 
       cors:
         enabled: false
