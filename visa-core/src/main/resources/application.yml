@@ -197,7 +197,8 @@ graphql:
       # hosts: ${VISA_VDI_REDIS_URL}
       devservices:
         enabled: false
-
+    mailer:
+      tls: false
 "%test":
   quarkus:
     scheduler:
