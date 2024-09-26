@@ -2,7 +2,6 @@ package eu.ill.visa.business;
 
 import io.quarkus.arc.Unremovable;
 import io.quarkus.mailer.Mailer;
-import io.quarkus.mailer.reactive.ReactiveMailer;
 import io.quarkus.mailer.MailerName;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
@@ -16,7 +15,7 @@ public class ConfigurationProducer {
     // Keep here so that the CDI bean is available when required by the Error Reporter
     @Inject
     @MailerName("logging")
-    ReactiveMailer loggingMailer;
+    Mailer loggingMailer;
 
     @Inject
     public ConfigurationProducer(final BusinessConfiguration businessConfiguration) {
