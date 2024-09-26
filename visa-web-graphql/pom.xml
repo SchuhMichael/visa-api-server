@@ -22,7 +22,7 @@
         <plugin>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-maven-plugin</artifactId>
-            <version>3.11.3</version>
+            <version>3.15.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -36,7 +36,7 @@
         <plugin>
             <groupId>io.smallrye</groupId>
             <artifactId>jandex-maven-plugin</artifactId>
-            <version>3.1.8</version>
+            <version>3.2.2</version>
             <executions>
                 <execution>
                     <goals>
