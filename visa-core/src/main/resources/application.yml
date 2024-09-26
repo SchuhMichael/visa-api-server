@@ -1,6 +1,12 @@
 quarkus:
   mailer:
-    tls: false
+    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:false}
+    host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST}
+    port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT}
+    logging:
+      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST}
+      port: ${VISA_LOGGING_EMAIL_APPENDER_PORT:25}
+      ssl: ${VISA_LOGGING_EMAIL_APPENDER_SSL:false}
   package:
     jar:
       type: mutable-jar
