@@ -9,8 +9,8 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-# RUN ./mvnw clean package -B -Dquarkus.package.jar.type=uber-jar -DskipTests=true $MAVEN_OPTS
-RUN ./mvnw clean package -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
+RUN ./mvnw clean package -B -Dquarkus.package.jar.type=uber-jar -Dquarkus.generate-code.skip=true -DskipTests=true $MAVEN_OPTS
+# RUN ./mvnw clean package -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
 
 
 # Stage 2: Create the runtime image
@@ -24,12 +24,12 @@ COPY --from=builder /usr/src/app /app
 WORKDIR /app
 
 # EXPOSE 8086 8087 
-EXPOSE 5005 8081 8086 8087 
+EXPOSE 5005 8081 8086
 
 # Run the application 
 # CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
 # CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
-CMD ["java", "-jar", "visa-app/target/visa-app-runner.jar"]
+CMD ["java", "-jar", "visa-app/target/visa-app.jar"]
 
 
 
