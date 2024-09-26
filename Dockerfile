@@ -9,8 +9,8 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-# RUN ./mvnw clean package -B -Dquarkus.package.type=uber-jar -DskipTests=true $MAVEN_OPTS
-RUN ./mvnw clean package -B -Dquarkus.package.type=mutable-jar -DskipTests=true $MAVEN_OPTS
+# RUN ./mvnw clean package -B -Dquarkus.package.jar.type=uber-jar -DskipTests=true $MAVEN_OPTS
+RUN ./mvnw clean package -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
 
 
 # Stage 2: Create the runtime image

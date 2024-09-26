@@ -10,6 +10,7 @@
     <artifactId>visa-web-rest</artifactId>
     <properties>
         <maven-model.version>3.9.6</maven-model.version>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>    
     </properties>
     <build>
         <plugins>

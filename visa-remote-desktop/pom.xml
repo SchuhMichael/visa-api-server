@@ -12,6 +12,7 @@
     <properties>
         <guacamole.version>1.5.5</guacamole.version>
         <webx-relay.version>0.1.0</webx-relay.version>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
     </properties>
     <build>
         <plugins>

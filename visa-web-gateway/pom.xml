@@ -50,6 +50,7 @@
         </plugins>
     </build>
     <properties>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
     </properties>
 
     <dependencies>

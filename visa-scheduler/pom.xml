@@ -8,6 +8,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>visa-scheduler</artifactId>
+    <properties>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
+    </properties>    
     <build>
         <plugins>
             <plugin>

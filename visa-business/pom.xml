@@ -13,6 +13,7 @@
         <commons-lang.version>3.14.0</commons-lang.version>
         <pebble.version>3.2.2</pebble.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
     </properties>
     <build>
         <plugins>
