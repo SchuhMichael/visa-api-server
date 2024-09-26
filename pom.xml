@@ -33,7 +33,7 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <quarkus.platform.version>3.11.3</quarkus.platform.version>
+        <quarkus.platform.version>3.15.0</quarkus.platform.version>
         <commons-lang.version>3.14.0</commons-lang.version>
     </properties>
 
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bom</artifactId>
-                <version>3.11.3</version>
+                <version>3.15.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -56,7 +56,7 @@
                 <plugin>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-maven-plugin</artifactId>
-                    <version>3.11.3</version>
+                    <version>3.15.0</version>
                     <executions>
                     <execution>
                         <goals>
