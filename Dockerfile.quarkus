@@ -23,8 +23,10 @@ COPY --from=builder /usr/src/app usr/src/app
 
 WORKDIR /usr/src/app
 
-# EXPOSE 8086 8087 
-EXPOSE 5005 8081 8086 8087 
+RUN chmod o+rw -R /usr/src/app
+
+# EXPOSE 8086  
+EXPOSE 5005 8086  
 
 # Run the application 
 # CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
