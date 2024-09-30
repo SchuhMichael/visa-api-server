@@ -5,9 +5,10 @@ ARG MAVEN_OPTS
 
 RUN mkdir -p /usr/src/app
 
+COPY . /usr/src/app
+
 WORKDIR /usr/src/app
 
-COPY . /usr/src/app
 
 # RUN ./mvnw clean package -B -Dquarkus.package.jar.type=uber-jar -DskipTests=true $MAVEN_OPTS
 RUN ./mvnw clean package -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
@@ -29,7 +30,7 @@ RUN chmod o+rw -R /usr/src/app
 EXPOSE 5005 8086  
 
 # Run the application 
-CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0" "visa-app/target/quarkus-app/quarkus-run.jar"]
+CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
 # CMD ["java", "-jar", "visa-app/target/quarkus-app/quarkus-run.jar"]
 # CMD ["java", "-jar", "visa-app/target/visa-app.jar"]
 
