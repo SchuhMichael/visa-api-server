@@ -1,19 +1,19 @@
 quarkus:
   mailer:
-    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED:false}
+    mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED}
     host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST}
     port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT}
-    logging:
-      host: ${VISA_LOGGING_EMAIL_APPENDER_HOST}
-      port: ${VISA_LOGGING_EMAIL_APPENDER_PORT:25}
-      ssl: ${VISA_LOGGING_EMAIL_APPENDER_SSL:false}
+    tls: ${VISA_LOGGING_EMAIL_APPENDER_TLS}
+      
+  dev-mode: ${QUARKUS_LAUNCH_DEVMODE:false}
   package:
+    main-class: visa-app
     jar:
       type: mutable-jar
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api
-    instrumentation: true
+    instrumentation: false
   oidc:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID:}
@@ -171,7 +171,7 @@ graphql:
     - graphql/schema.graphql
 
 "%prod":
-  quarkus:
+  quarkus:  
     datasource:
       username: ${VISA_DATABASE_USERNAME}
       password: ${VISA_DATABASE_PASSWORD}
@@ -206,7 +206,12 @@ graphql:
       devservices:
         enabled: false
     mailer:
+      mock: true
       tls: false
+      host: mailer.com
+      logging:
+        host: mailer.com
+        mock: true
 "%test":
   quarkus:
     scheduler:
