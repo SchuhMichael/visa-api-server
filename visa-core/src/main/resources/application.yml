@@ -7,7 +7,6 @@ quarkus:
       
   dev-mode: ${QUARKUS_LAUNCH_DEVMODE:false}
   package:
-    main-class: visa-app
     jar:
       type: mutable-jar
   live-reload:

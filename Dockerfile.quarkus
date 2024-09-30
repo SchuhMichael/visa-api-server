@@ -5,13 +5,23 @@ ARG MAVEN_OPTS
 
 RUN mkdir -p /usr/src/app
 
-COPY . /usr/src/app
-
 WORKDIR /usr/src/app
 
+COPY . /usr/src/app
 
 # RUN ./mvnw clean package -B -Dquarkus.package.jar.type=uber-jar -DskipTests=true $MAVEN_OPTS
-RUN ./mvnw clean install -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
+RUN ./mvnw clean package -B -Dquarkus.package.jar.type=mutable-jar -DskipTests=true $MAVEN_OPTS
+
+
+# Stage 2: Create the runtime image
+FROM amazoncorretto:21-alpine
+
+RUN mkdir -p /app
+
+# Copy the Maven wrapper and application source code for dev mode
+COPY --from=builder /usr/src/app usr/src/app
+
+WORKDIR /usr/src/app
 
 RUN chmod o+rw -R /usr/src/app
 
@@ -20,6 +30,11 @@ EXPOSE 5005 8086
 
 # Run the application 
 CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
+
+# CMD ./mvnw quarkus:dev -pl visa-app -Dquarkus.http.host=0.0.0.0
+
+
+
 
 
 
