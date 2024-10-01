@@ -1,4 +1,7 @@
 quarkus:
+  package:
+    jar:
+      type: mutable-jar
   mailer:
     mock: ${VISA_NOTIFICATION_EMAIL_ADAPTER_MOCKED}
     host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST}
@@ -6,9 +9,6 @@ quarkus:
     tls: ${VISA_LOGGING_EMAIL_APPENDER_TLS}
   dev:
     allow-remote: true
-  package:
-    jar:
-      type: mutable-jar
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api

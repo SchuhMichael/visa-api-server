@@ -6,7 +6,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@QuarkusMain(name = "visa-main")
+@QuarkusMain
 public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);

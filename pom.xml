@@ -6,6 +6,7 @@
     <groupId>eu.ill.visa</groupId>
     <artifactId>api</artifactId>
     <version>3.0.0</version>
+    <packaging>pom</packaging>
 
     <modules>
         <module>visa-core</module>
@@ -22,18 +23,18 @@
         <module>visa-app</module>
     </modules>
 
-    <packaging>pom</packaging>
 
     <properties>
-        <compiler-plugin.version>3.12.1</compiler-plugin.version>
+        <quarkus.package.type>mutable-jar</quarkus.package.type>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <skipITs>true</skipITs>
-        <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <quarkus.platform.version>3.11.1</quarkus.platform.version>
+        <surefire-plugin.version>3.5.0</surefire-plugin.version>
+        <quarkus.platform.version>3.15.1</quarkus.platform.version>
         <commons-lang.version>3.14.0</commons-lang.version>
     </properties>
 
@@ -100,7 +101,7 @@
             <plugin>
                 <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>3.1.6</version>
+                <version>3.2.2</version>
                 <executions>
                     <execution>
                         <id>make-index</id>
