@@ -68,7 +68,7 @@ hs_err_pid*
 # Plugin directory
 /.quarkus/cli/plugins/
 
-*.env
+
 certs/
 pgdata*
 log

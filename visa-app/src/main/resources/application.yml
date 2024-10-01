@@ -1,0 +1,13 @@
+quarkus:
+  launch:
+    devmode: true
+  package:
+    main-class: "visa-main"
+  dev:
+    allow-remote: true
+  http:
+    auth:
+      permission:
+        dev-ui:
+          paths: /api/q/dev-ui
+          policy: permit

@@ -10,6 +10,7 @@
     <artifactId>visa-app</artifactId>
 
     <properties>
+        <quarkus.package.main-class>visa-main</quarkus.package.main-class>
         <copy-rename-maven-plugin.version>1.0</copy-rename-maven-plugin.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
     </properties>

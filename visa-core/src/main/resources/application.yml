@@ -4,15 +4,15 @@ quarkus:
     host: ${VISA_NOTIFICATION_EMAIL_ADAPTER_HOST}
     port: ${VISA_NOTIFICATION_EMAIL_ADAPTER_PORT}
     tls: ${VISA_LOGGING_EMAIL_APPENDER_TLS}
-      
-  dev-mode: ${QUARKUS_LAUNCH_DEVMODE:false}
+  dev:
+    allow-remote: true
   package:
     jar:
       type: mutable-jar
   live-reload:
     password: ${VISA_DATABASE_PASSWORD}
     url: ${VISA_SERVER_HOST:localhost}/api
-    instrumentation: false
+    instrumentation: true
   oidc:
     auth-server-url: ${VISA_CLIENT_CONFIG_LOGIN_ISSUER}
     client-id: ${VISA_CLIENT_CONFIG_LOGIN_CLIENT_ID:}
@@ -43,8 +43,6 @@ quarkus:
       generation: update
     log:
       sql: false
-  scheduler:
-    enabled: ${VISA_SCHEDULER_ENABLED:true}
   devservices:
     enabled: true
   rest-client:
@@ -70,6 +68,10 @@ quarkus:
         level: INFO
 #      "org.jboss.resteasy.reactive.client.logging":
 #        level: DEBUG
+
+scheduler:
+  enabled: ${VISA_SCHEDULER_ENABLED:true}
+
 
 cloud:
   serverNamePrefix: ${VISA_CLOUD_SERVER_NAME_PREFIX}
