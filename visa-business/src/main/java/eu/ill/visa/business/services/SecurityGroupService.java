@@ -11,6 +11,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,8 @@ public class SecurityGroupService {
     private final SecurityGroupRepository repository;
     private final SecurityGroupServiceClientConfiguration securityGroupServiceClientConfiguration;
 
+    @RestClient
+    @Inject
     private final SecurityGroupServiceClient securityGroupServiceClient;
 
     @Inject

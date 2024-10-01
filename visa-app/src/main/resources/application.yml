@@ -5,6 +5,7 @@ quarkus:
     main-class: "visa-main"
   dev:
     allow-remote: true
+    rebuild-on-fail: true
   http:
     auth:
       permission:
