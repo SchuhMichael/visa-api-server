@@ -74,3 +74,5 @@ pgdata*
 log
 .vscode
 .worktrees
+
+**/effective-pom.xml
