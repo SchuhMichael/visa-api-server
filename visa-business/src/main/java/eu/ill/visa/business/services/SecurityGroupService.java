@@ -31,7 +31,6 @@ public class SecurityGroupService {
     private final SecurityGroupServiceClientConfiguration securityGroupServiceClientConfiguration;
 
     @RestClient
-    @Inject
     private final SecurityGroupServiceClient securityGroupServiceClient;
 
     @Inject
