@@ -12,7 +12,7 @@ public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String ... args) {
-        logger.info("Starting live-coding VISA application");
+        logger.info("Starting VISA application");
         Quarkus.run(args);
     }
 }

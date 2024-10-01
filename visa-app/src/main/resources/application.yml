@@ -1,6 +1,7 @@
 quarkus:
   launch:
     devmode: true
+    rebuild: true
   package:
     main-class: "visa-main"
   dev:

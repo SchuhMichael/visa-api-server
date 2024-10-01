@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>api</artifactId>
         <groupId>eu.ill.visa</groupId>
@@ -10,7 +12,6 @@
     <artifactId>visa-app</artifactId>
 
     <properties>
-        <quarkus.package.main-class>visa-main</quarkus.package.main-class>
         <copy-rename-maven-plugin.version>1.0</copy-rename-maven-plugin.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
     </properties>
@@ -20,7 +21,7 @@
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                <version>3.15.0</version>
+                <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -53,35 +54,25 @@
             <artifactId>visa-scheduler</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>eu.ill.visa</groupId>
-            <artifactId>visa-message-broker</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-oidc</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
         <finalName>visa-app</finalName>
         <plugins>
             <plugin>
-                <groupId>io.quarkus</groupId>
+                <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>3.15.0</version>
-                <executions>                
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <executions>
                     <execution>
                         <goals>
                             <goal>build</goal>
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
-                        </goals>    
+                        </goals>
                     </execution>
-                </executions>                 
-                <extensions>true</extensions>
+                </executions>
             </plugin>
 
             <plugin>
@@ -93,18 +84,7 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
-                <plugin>
-                    <groupId>io.smallrye</groupId>
-                    <artifactId>jandex-maven-plugin</artifactId>
-                    <version>3.2.2</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>jandex</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
@@ -159,8 +139,11 @@
                                 </goals>
                                 <configuration>
                                     <systemPropertyVariables>
-                                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
-                                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                        <native.image.path>
+                                            ${project.build.directory}/${project.build.finalName}-runner
+                                        </native.image.path>
+                                        <java.util.logging.manager>org.jboss.logmanager.LogManager
+                                        </java.util.logging.manager>
                                         <maven.home>${maven.home}</maven.home>
                                     </systemPropertyVariables>
                                 </configuration>
@@ -171,7 +154,7 @@
             </build>
             <properties>
                 <quarkus.native.additional-build-args>--initialize-at-run-time=eu.ill.visa.business.services.InstanceNameGeneratorService\,zmq.util.Utils</quarkus.native.additional-build-args>
-                <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
+                <quarkus.package.type>native</quarkus.package.type>
             </properties>
         </profile>
     </profiles>
