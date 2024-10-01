@@ -253,7 +253,7 @@ graphql:
 
   business:
     securityGroupServiceClient:
-      enabled: false
+      enabled: ${VISA_SECURITY_GROUP_SERVICE_CLIENT_ENABLED:false}
     mailer:
       enabled: false
 

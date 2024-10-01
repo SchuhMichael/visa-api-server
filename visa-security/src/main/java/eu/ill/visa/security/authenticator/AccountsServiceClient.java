@@ -20,13 +20,14 @@ public interface AccountsServiceClient {
 
     @ClientExceptionMapper
     static RuntimeException toException(Response response) {
+        String msg = null;
+    
         if (response.getStatus() == 401) {
-            return new RuntimeException("[AccountToken] Caught unauthenticated access to VISA: " + response.readEntity(String.class));
-
+            msg = "[AccountToken] Caught unauthenticated access to VISA: " + response.readEntity(String.class);
         } else if (response.getStatus() != 200) {
-            return new RuntimeException("[AccountToken] Caught HTTP error (" + response.getStatus() + ": " + response.readEntity(String.class) + ") authenticating user access token");
+            msg = "[AccountToken] Caught HTTP error (" + response.getStatus() + ": " + response.readEntity(String.class) + ") authenticating user access token";
         }
-
-        return null;
+    
+        return msg != null ? new RuntimeException(msg) : null;
     }
 }

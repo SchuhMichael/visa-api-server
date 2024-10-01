@@ -25,7 +25,7 @@
 
 
     <properties>
-        <quarkus.package.type>mutable-jar</quarkus.package.type>
+        <quarkus.package.jar.type>mutable-jar</quarkus.package.jar.type>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
