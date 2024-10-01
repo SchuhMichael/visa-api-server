@@ -127,7 +127,7 @@
             </build>
             <properties>
                 <quarkus.native.additional-build-args>--initialize-at-run-time=eu.ill.visa.business.services.InstanceNameGeneratorService\,zmq.util.Utils</quarkus.native.additional-build-args>
-                <quarkus.package.jar.type>native</quarkus.package.jar.type>
+                <quarkus.package.jar.type>fast-jar</quarkus.package.jar.type>
             </properties>
         </profile>
     </profiles>
